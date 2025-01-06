@@ -1,0 +1,8 @@
+{
+  "go.buildTags": "windows",
+  "go.lintTool": "golangci-lint",
+  "go.lintFlags": [
+    "--build-tags windows"
+  ],
+  "makefile.configureOnOpen": false
+}
