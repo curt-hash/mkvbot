@@ -4,7 +4,6 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
-	"log"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -19,7 +18,8 @@ var profileBytes []byte
 func main() {
 	cmd := newCLICommand()
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
-		log.Fatal(err)
+		fmt.Printf("Fatal error: %s\n", err.Error())
+		os.Exit(1)
 	}
 }
 
