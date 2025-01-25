@@ -81,7 +81,9 @@ brews:
     commit_author:
       name: Curt Hash
       email: curt.hash@gmail.com
+    directory: Formula
     homepage: github.com/curt-hash/mkvbot
     description: Automation for makemkv
+    license: MIT
     test: |
       system "#{bin}/mkvbot -v"
