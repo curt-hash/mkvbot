@@ -67,7 +67,7 @@ snapcrafts:
   - title: mkvbot
     summary: Automation for makemkv
     description: TUI application that streamlines ripping the best title with makemkv.
-    grade: stable
+    grade: devel
     confinement: classic
     license: MIT
     base: core22
