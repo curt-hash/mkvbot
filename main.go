@@ -48,6 +48,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 			ReadCacheSizeMB:  cmd.Int("cache"),
 			MinLengthSeconds: cmd.Int("minlength"),
 		},
+		debug: cmd.Bool("debug"),
 	}
 
 	app, err := newApplication(cfg)
