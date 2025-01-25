@@ -32,6 +32,10 @@ func newCLICommand() *cli.Command {
 				Usage:   "pass --profile=`PATH` to makemkv",
 				Aliases: []string{"p"},
 			},
+			&cli.BoolFlag{
+				Name:  "create-profile",
+				Usage: "create a default profile.xml for use with --profile",
+			},
 			&cli.IntFlag{
 				Name:    "cache",
 				Value:   1024,
