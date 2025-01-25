@@ -461,7 +461,7 @@ func (b *statusBox) update() {
 				buf.WriteRune(progressBarEmptyChar)
 			}
 		}
-		w.Write(buf.Bytes())
+		_, _ = w.Write(buf.Bytes())
 
 		fmt.Fprintf(w, " %3d%%", int(b.progress*100))
 	}

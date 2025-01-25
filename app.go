@@ -42,7 +42,7 @@ func (cfg *applicationConfig) validate() error {
 
 func newApplication(cfg *applicationConfig) (*application, error) {
 	if err := cfg.validate(); err != nil {
-		return nil, fmt.Errorf("validate config %#+v: %w", cfg)
+		return nil, fmt.Errorf("validate config %#+v: %w", cfg, err)
 	}
 
 	con, err := makemkvcon.New(cfg.makemkvConfig)
@@ -154,9 +154,9 @@ func (app *application) tryBackupBestTitle(ctx context.Context, drive *makemkvco
 
 		switch v := line.(type) {
 		case *makemkvcon.TotalProgressLine:
-			app.tui.setTask(v.Name)
+			app.tui.setTask("%s", v.Name)
 		case *makemkvcon.CurrentProgressLine:
-			app.tui.setSubtask(v.Name)
+			app.tui.setSubtask("%s", v.Name)
 		case *makemkvcon.ProgressBarLine:
 			app.tui.setProgress(v.TotalProgress())
 		case *makemkvcon.MessageLine:
@@ -250,9 +250,9 @@ func (app *application) backupTitle(ctx context.Context, drive *makemkvcon.Drive
 
 		switch v := line.(type) {
 		case *makemkvcon.TotalProgressLine:
-			app.tui.setTask(v.Name)
+			app.tui.setTask("%s", v.Name)
 		case *makemkvcon.CurrentProgressLine:
-			app.tui.setSubtask(v.Name)
+			app.tui.setSubtask("%s", v.Name)
 		case *makemkvcon.ProgressBarLine:
 			app.tui.setProgress(v.TotalProgress())
 		case *makemkvcon.MessageLine:
