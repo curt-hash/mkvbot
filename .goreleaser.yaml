@@ -42,6 +42,8 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+      - "^build:"
+      - "^chore:"
 
 nfpms:
   - file_name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
