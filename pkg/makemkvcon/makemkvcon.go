@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+	"slices"
 	"strconv"
 	"time"
 
@@ -59,7 +60,7 @@ func New(cfg *MakeMKVConConfig) (*MakeMKVCon, error) {
 
 func (c *MakeMKVCon) ListDrives(ctx context.Context) (*LineIterator[[]*DriveScanLine], error) {
 	// disc:9999 should trigger early termination since it is unlikely to exist.
-	seq, err := c.runCmd(ctx, "-r", "info", "disc:9999")
+	seq, err := c.runCmd(ctx, "info", "disc:9999")
 	if err != nil {
 		return nil, err
 	}
@@ -88,13 +89,7 @@ func (c *MakeMKVCon) ListDrives(ctx context.Context) (*LineIterator[[]*DriveScan
 }
 
 func (c *MakeMKVCon) ScanDrive(ctx context.Context, driveIndex int) (*LineIterator[*Disc], error) {
-	seq, err := c.runCmd(
-		ctx,
-		"-r",
-		fmt.Sprintf("--minlength=%d", c.cfg.MinLengthSeconds),
-		"info",
-		fmt.Sprintf("disc:%d", driveIndex),
-	)
+	seq, err := c.runCmd(ctx, "info", fmt.Sprintf("disc:%d", driveIndex))
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +155,6 @@ func (c *MakeMKVCon) BackupTitle(ctx context.Context, driveIndex, titleIndex int
 		"--decrypt",
 		fmt.Sprintf("--cache=%d", c.cfg.ReadCacheSizeMB),
 		"--noscan",
-		"-r",
 		"--progress=-same",
 		fmt.Sprintf("disc:%d", driveIndex),
 		strconv.Itoa(titleIndex),
@@ -169,11 +163,16 @@ func (c *MakeMKVCon) BackupTitle(ctx context.Context, driveIndex, titleIndex int
 }
 
 func (c *MakeMKVCon) runCmd(ctx context.Context, args ...string) (iter.Seq2[Line, error], error) {
-	if c.cfg.ProfilePath != "" {
-		args = append([]string{fmt.Sprintf("--profile=%s", c.cfg.ProfilePath)}, args...)
+	defaultArgs := []string{
+		fmt.Sprintf("--minlength=%d", c.cfg.MinLengthSeconds),
+		"-r",
 	}
 
-	cmd := exec.CommandContext(ctx, c.cfg.ExePath, args...)
+	if c.cfg.ProfilePath != "" {
+		defaultArgs = append(defaultArgs, fmt.Sprintf("--profile=%s", c.cfg.ProfilePath))
+	}
+
+	cmd := exec.CommandContext(ctx, c.cfg.ExePath, slices.Concat(defaultArgs, args)...)
 	cmd.WaitDelay = time.Second
 
 	stdout, err := cmd.StdoutPipe()
