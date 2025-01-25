@@ -25,7 +25,7 @@ tasks:
         vars:
           GOOS: "darwin"
           GOARCH: "arm64"
-  
+
   build_single_target:
     env:
       GOOS: "{{.GOOS}}"
@@ -41,6 +41,10 @@ tasks:
     cmds:
       - goreleaser check
       - goreleaser release --clean
+
+  changelog:
+    cmds:
+      - git log $(git describe --tags --abbrev=0)..HEAD --oneline
 
   generate:
     cmds:
