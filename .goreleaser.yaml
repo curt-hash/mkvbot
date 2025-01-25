@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+version: 2
+
+project_name: mkvbot
+
+before:
+  hooks:
+    - go install golang.org/x/tools/cmd/stringer@latest 
+    - go generate ./...
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -X main.Version={{ .Version }}
+
+archives:
+  - formats: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        formats: zip
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+nfpms:
+  - file_name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
+    maintainer: Curt Hash
+    homepage: github.com/curt-hash/mkvbot
+    description: Automation for makemkv
+    license: MIT
+    formats:
+      - deb
+      - rpm
+      - apk
+    bindir: /usr/bin
+    section: utils
+    contents:
+      - src: ./LICENSE
+        dst: /usr/share/doc/makemkv/copyright
+        file_info:
+          mode: 0644
+
+snapcrafts:
+  - summary: Automation for makemkv
+    description: TUI application that streamlines ripping the best title with makemkv.
+    grade: stable
+    confinement: classic
+    license: MIT
+    base: core22
+    extra_files:
+      - source: LICENSE
+        destination: /usr/share/doc/makemkv/copyright
+        mode: 0644
+
+brews:
+  - name: mkvbot
+    repository:
+      owner: curt-hash
+      name: homebrew-mkvbot
+    commit_author:
+      name: Curt Hash
+      email: curt.hash@gmail.com
+    homepage: github.com/curt-hash/mkvbot
+    description: Automation for makemkv
+    test: |
+      system "#{bin}/mkvbot -v"

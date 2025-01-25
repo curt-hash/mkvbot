@@ -2,7 +2,7 @@ package defs
 
 // Originally from apdefs.h in the makemkv for Linux source tarball.
 
-//go:generate go run golang.org/x/tools/cmd/stringer@latest -type=Attr
+//go:generate stringer -type=Attr
 type Attr int
 
 const (
@@ -59,7 +59,7 @@ const (
 	OffsetSequenceID // 50
 )
 
-//go:generate go run golang.org/x/tools/cmd/stringer@latest -type=TypeCode -trimprefix=TypeCode
+//go:generate stringer -type=TypeCode -trimprefix=TypeCode
 type TypeCode int
 
 const (

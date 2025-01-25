@@ -10,7 +10,9 @@ MakeMKV. It runs a simple processing loop:
 1. Identify and rip the best title
 1. Eject the disc
 
-`mkvbot` is not fancy. If you want fancy, maybe check out a project like
+`mkvbot` has limited functionality and is not fully automated. That might work
+for you. It works for me. If you are looking for something more complex, maybe
+check out a project like
 [automatic-ripping-machine](https://github.com/automatic-ripping-machine/automatic-ripping-machine).
 
 `mkvbot` is designed to be lightweight and portable. It is a single executable
@@ -18,8 +20,24 @@ that can run on an old Raspberry Pi.
 
 ## Installation
 
-1. Install [makemkv](https://makemkv.com/).
-1. Install `mkvbot`. Currently that requires building from source (see the [Makefile](Makefile)).
+`mkvbot` requires [makemkv](https://makemkv.com/).
+
+### Release
+
+Find an appropriate package for your operating system and architecture on the
+[Releases](https://github.com/curt-hash/mkvbot/releases) page.
+
+### Homebrew
+
+```sh
+brew install mkvbot
+```
+
+### Snap
+
+```
+snap install mkvbot --classic
+```
 
 ## Usage
 
@@ -35,7 +53,7 @@ Run `mkvbot.exe -h` to see all of the command-line options.
 
 Since it does not always pick the correct title or movie metadata, it currently
 prompts for confirmation. It will also prompt you to choose the best title if
-there is a tie. That could change as it gets smarter.
+there is a tie. That may change as it gets smarter.
 
 Audio track and subtitles selection is based on the value of
 `app_DefaultSelectionString` in [profile.xml](profile.xml). For whatever reason,

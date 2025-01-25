@@ -1,0 +1,55 @@
+version: '3'
+
+tasks:
+  default:
+    cmds:
+      - task: build_windows
+
+  build_windows:
+    cmds:
+      - task: build_single_target
+        vars:
+          GOOS: "windows"
+          GOARCH: "amd64"
+
+  build_linux:
+    cmds:
+      - task: build_single_target
+        vars:
+          GOOS: "linux"
+          GOARCH: "amd64"
+
+  build_darwin:
+    cmds:
+      - task: build_single_target
+        vars:
+          GOOS: "darwin"
+          GOARCH: "arm64"
+  
+  build_single_target:
+    env:
+      GOOS: "{{.GOOS}}"
+      GOARCH: "{{.GOARCH}}"
+    cmds:
+      - goreleaser build --snapshot --single-target --clean
+
+  release_local:
+    cmds:
+      - goreleaser release --snapshot --clean
+
+  release:
+    cmds:
+      - goreleaser check
+      - goreleaser release --clean
+
+  generate:
+    cmds:
+      - go generate ./...
+
+  tidy:
+    cmds:
+      - go mod tidy
+
+  clean:
+    cmds:
+      - rm -rf dist
