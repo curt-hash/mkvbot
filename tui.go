@@ -202,6 +202,7 @@ func (t *textUserInterface) getMovieTitleForSearch(ctx context.Context, q string
 			AddButton("Continue", func() {
 				close(continueChan)
 			})
+		t.userInputForm.SetFocus(1)
 
 		t.pages.SwitchToPage(userInputPageName)
 		t.SetFocus(t.pages)
@@ -240,11 +241,12 @@ func (t *textUserInterface) getMovieMetadata(ctx context.Context, md *moviedb.Me
 				yearInput := t.userInputForm.GetFormItemByLabel("Year").(*tview.InputField)
 				var err error
 				if md.Year, err = strconv.Atoi(yearInput.GetText()); err != nil {
-					t.SetFocus(yearInput)
+					t.userInputForm.SetFocus(1)
 				} else {
 					close(continueChan)
 				}
 			})
+		t.userInputForm.SetFocus(3)
 
 		t.pages.SwitchToPage(userInputPageName)
 		t.SetFocus(t.pages)
