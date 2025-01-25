@@ -64,7 +64,8 @@ nfpms:
           mode: 0644
 
 snapcrafts:
-  - summary: Automation for makemkv
+  - title: mkvbot
+    summary: Automation for makemkv
     description: TUI application that streamlines ripping the best title with makemkv.
     grade: stable
     confinement: classic
@@ -74,6 +75,7 @@ snapcrafts:
       - source: LICENSE
         destination: /usr/share/doc/makemkv/copyright
         mode: 0644
+    publish: false
 
 brews:
   - name: mkvbot
@@ -84,8 +86,8 @@ brews:
       name: Curt Hash
       email: curt.hash@gmail.com
     directory: Formula
-    homepage: github.com/curt-hash/mkvbot
+    homepage: https://github.com/curt-hash/mkvbot
     description: Automation for makemkv
     license: MIT
     test: |
-      system "#{bin}/mkvbot -v"
+      system "#{bin}/mkvbot", "-v"

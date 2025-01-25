@@ -30,10 +30,13 @@ Find an appropriate package for your operating system and architecture on the
 ### Homebrew
 
 ```sh
+brew tap curt-hash/homebrew-mkvbot
 brew install mkvbot
 ```
 
 ### Snap
+
+_This is not working yet (pending name registration)._
 
 ```
 snap install mkvbot --classic
