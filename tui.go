@@ -25,6 +25,7 @@ const (
 )
 
 type textUserInterface struct {
+	*beeper
 	*tview.Application
 
 	interruptChan chan struct{}
@@ -45,7 +46,7 @@ type textUserInterface struct {
 	pages              *tview.Pages
 }
 
-func newTextUserInterface() *textUserInterface {
+func newTextUserInterface(beeper *beeper) *textUserInterface {
 	app := tview.NewApplication()
 
 	// Notify the main application about the Ctrl+C by closing the channel rather
@@ -122,6 +123,8 @@ func newTextUserInterface() *textUserInterface {
 	app.SetRoot(flex, true).SetFocus(flex)
 
 	return &textUserInterface{
+		beeper: beeper,
+
 		Application: app,
 
 		interruptChan: interruptChan,
@@ -206,6 +209,7 @@ func (t *textUserInterface) getMovieTitleForSearch(ctx context.Context, q string
 
 		t.pages.SwitchToPage(userInputPageName)
 		t.SetFocus(t.pages)
+		t.beep()
 	})
 
 	select {
@@ -250,6 +254,7 @@ func (t *textUserInterface) getMovieMetadata(ctx context.Context, md *moviedb.Me
 
 		t.pages.SwitchToPage(userInputPageName)
 		t.SetFocus(t.pages)
+		t.beep()
 	})
 
 	select {
@@ -342,6 +347,7 @@ func (t *textUserInterface) getBestTitle(ctx context.Context, choices []*makemkv
 
 		t.pages.SwitchToPage(userInputPageName)
 		t.SetFocus(t.pages)
+		t.beep()
 	})
 
 	select {

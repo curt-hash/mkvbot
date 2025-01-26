@@ -24,13 +24,13 @@ func main() {
 }
 
 func run(ctx context.Context, cmd *cli.Command) error {
-	if cmd.Bool("create-profile") {
+	if cmd.Bool(createProfileFlagName) {
 		if err := os.WriteFile("profile.xml", profileBytes, 0644); err != nil {
 			return fmt.Errorf("create profile.xml: %w", err)
 		}
 	}
 
-	profilePath := cmd.String("profile")
+	profilePath := cmd.String(profileFlagName)
 	if _, err := os.Stat(profilePath); err == nil {
 		if profilePath, err = filepath.Abs(profilePath); err != nil {
 			return fmt.Errorf("get absolute path of %q: %w", profilePath, err)
@@ -40,15 +40,22 @@ func run(ctx context.Context, cmd *cli.Command) error {
 		profilePath = ""
 	}
 
+	weights := make(map[string]int64, len(bestTitleHeuristics))
+	for _, h := range bestTitleHeuristics {
+		weights[h.name] = cmd.Int(h.flagName)
+	}
+
 	cfg := &applicationConfig{
-		outputDirPath: cmd.String("output-dir"),
+		outputDirPath: cmd.String(outputDirFlagName),
 		makemkvConfig: &makemkvcon.MakeMKVConConfig{
-			ExePath:          cmd.String("makemkvcon"),
+			ExePath:          cmd.String(makemkvconFlagName),
 			ProfilePath:      profilePath,
-			ReadCacheSizeMB:  cmd.Int("cache"),
-			MinLengthSeconds: cmd.Int("minlength"),
+			ReadCacheSizeMB:  cmd.Int(cacheFlagName),
+			MinLengthSeconds: cmd.Int(minLengthFlagName),
 		},
-		debug: cmd.Bool("debug"),
+		debug:                      cmd.Bool(debugFlagName),
+		quiet:                      cmd.Bool(quietFlagName),
+		bestTitleHeuristicsWeights: weights,
 	}
 
 	app, err := newApplication(cfg)

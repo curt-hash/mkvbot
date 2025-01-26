@@ -15,14 +15,17 @@ import (
 	"github.com/curt-hash/mkvbot/pkg/makemkvcon"
 	"github.com/curt-hash/mkvbot/pkg/makemkvcon/defs"
 	"github.com/curt-hash/mkvbot/pkg/moviedb"
+	"github.com/gen2brain/beeep"
 	"golang.org/x/sync/errgroup"
 )
 
 type (
 	applicationConfig struct {
-		outputDirPath string
-		makemkvConfig *makemkvcon.MakeMKVConConfig
-		debug         bool
+		outputDirPath              string
+		makemkvConfig              *makemkvcon.MakeMKVConConfig
+		debug                      bool
+		quiet                      bool
+		bestTitleHeuristicsWeights map[string]int64
 	}
 
 	application struct {
@@ -35,6 +38,12 @@ type (
 func (cfg *applicationConfig) validate() error {
 	if _, err := os.Stat(cfg.outputDirPath); err != nil {
 		return fmt.Errorf("stat %q: %w", cfg.outputDirPath, err)
+	}
+
+	for _, h := range bestTitleHeuristics {
+		if _, ok := cfg.bestTitleHeuristicsWeights[h.name]; !ok {
+			return fmt.Errorf("missing weight for best title heuristic: %q", h.name)
+		}
 	}
 
 	return nil
@@ -50,7 +59,7 @@ func newApplication(cfg *applicationConfig) (*application, error) {
 		return nil, fmt.Errorf("initialize makemkv controller: %w", err)
 	}
 
-	tui := newTextUserInterface()
+	tui := newTextUserInterface(newBeeper(!cfg.quiet))
 	setDefaultLogger(tui.logBox, cfg.debug)
 
 	return &application{
@@ -186,7 +195,7 @@ func (app *application) tryBackupBestTitle(ctx context.Context, drive *makemkvco
 
 	var title *makemkvcon.Title
 	app.tui.setStatus("Finding best title")
-	best := findBestTitle(disc)
+	best := findBestTitle(disc, app.cfg.bestTitleHeuristicsWeights)
 	switch len(best) {
 	case 0:
 		return fmt.Errorf("no best titles")
@@ -209,6 +218,7 @@ func (app *application) tryBackupBestTitle(ctx context.Context, drive *makemkvco
 		return fmt.Errorf("eject disc: %w", err)
 	}
 
+	app.tui.beep()
 	return nil
 }
 
@@ -294,4 +304,24 @@ func searchMovieDB(q string) (*moviedb.Metadata, error) {
 	}
 
 	return results[0], nil
+}
+
+type beeper struct {
+	enabled bool
+}
+
+func newBeeper(enabled bool) *beeper {
+	return &beeper{
+		enabled: enabled,
+	}
+}
+
+func (b *beeper) beep() {
+	if b.enabled {
+		for range 2 {
+			if err := beeep.Beep(2400, 500); err != nil {
+				slog.Error("beep error", "err", err)
+			}
+		}
+	}
 }

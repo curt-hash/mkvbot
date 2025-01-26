@@ -8,6 +8,17 @@ import (
 
 var Version string
 
+const (
+	debugFlagName         = "debug"
+	makemkvconFlagName    = "makemkvcon"
+	profileFlagName       = "profile"
+	createProfileFlagName = "create-profile"
+	cacheFlagName         = "cache"
+	minLengthFlagName     = "minlength"
+	outputDirFlagName     = "output-dir"
+	quietFlagName         = "quiet"
+)
+
 func newCLICommand() *cli.Command {
 	cmd := &cli.Command{
 		Name:      "mkvbot",
@@ -16,43 +27,48 @@ func newCLICommand() *cli.Command {
 		Copyright: "(c) 2025 Curt Hash",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
-				Name:  "debug",
+				Name:  debugFlagName,
 				Value: false,
 				Usage: "log debug messages",
 			},
 			&cli.StringFlag{
-				Name:    "makemkvcon",
+				Name:    makemkvconFlagName,
 				Value:   "",
 				Usage:   "`PATH` to makemkvcon executable",
 				Aliases: []string{"m"},
 			},
 			&cli.StringFlag{
-				Name:    "profile",
+				Name:    profileFlagName,
 				Value:   "profile.xml",
 				Usage:   "pass --profile=`PATH` to makemkv",
 				Aliases: []string{"p"},
 			},
 			&cli.BoolFlag{
-				Name:  "create-profile",
+				Name:  createProfileFlagName,
 				Usage: "create a default profile.xml for use with --profile",
 			},
 			&cli.IntFlag{
-				Name:    "cache",
+				Name:    cacheFlagName,
 				Value:   1024,
 				Usage:   "pass --cache=`SIZE` to makemkv",
 				Aliases: []string{"c"},
 			},
 			&cli.IntFlag{
-				Name:    "minlength",
+				Name:    minLengthFlagName,
 				Value:   1800,
 				Usage:   "pass --minlength=`N` to makemkv",
 				Aliases: []string{"l"},
 			},
 			&cli.StringFlag{
-				Name:    "output-dir",
+				Name:    outputDirFlagName,
 				Value:   ".",
 				Usage:   "create output files in `DIR`",
 				Aliases: []string{"o"},
+			},
+			&cli.BoolFlag{
+				Name:    quietFlagName,
+				Usage:   "do not beep",
+				Aliases: []string{"q"},
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {

@@ -7,6 +7,7 @@ import (
 )
 
 type bestTitleHeuristic struct {
+	name      string
 	f         func(*makemkvcon.Disc) []*makemkvcon.Title
 	weight    int64
 	flagName  string
@@ -15,6 +16,7 @@ type bestTitleHeuristic struct {
 
 var bestTitleHeuristics = []*bestTitleHeuristic{
 	{
+		name: "longest",
 		f: func(d *makemkvcon.Disc) []*makemkvcon.Title {
 			return d.TitlesWithLongestDuration()
 		},
@@ -23,6 +25,7 @@ var bestTitleHeuristics = []*bestTitleHeuristic{
 		flagUsage: "`WEIGHT` given to longest title(s)",
 	},
 	{
+		name: "most chapters",
 		f: func(d *makemkvcon.Disc) []*makemkvcon.Title {
 			return d.TitlesWithMostChapters()
 		},
@@ -31,6 +34,7 @@ var bestTitleHeuristics = []*bestTitleHeuristic{
 		flagUsage: "`WEIGHT` given to title(s) with the most chapters",
 	},
 	{
+		name: "angle one",
 		f: func(d *makemkvcon.Disc) []*makemkvcon.Title {
 			return d.TitlesWithAngle(1)
 		},
@@ -39,6 +43,7 @@ var bestTitleHeuristics = []*bestTitleHeuristic{
 		flagUsage: "`WEIGHT` given to title(s) with angle one",
 	},
 	{
+		name: "most streams",
 		f: func(d *makemkvcon.Disc) []*makemkvcon.Title {
 			return d.TitlesWithMostStreams()
 		},
@@ -48,11 +53,11 @@ var bestTitleHeuristics = []*bestTitleHeuristic{
 	},
 }
 
-func findBestTitle(disc *makemkvcon.Disc) []*makemkvcon.Title {
+func findBestTitle(disc *makemkvcon.Disc, weights map[string]int64) []*makemkvcon.Title {
 	scores := make([]int64, len(disc.Titles))
 	for _, h := range bestTitleHeuristics {
 		for _, title := range h.f(disc) {
-			scores[title.Index] += h.weight
+			scores[title.Index] += weights[h.name]
 		}
 	}
 	slog.Debug("scored titles", "scores", scores)
