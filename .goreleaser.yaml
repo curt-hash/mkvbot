@@ -75,7 +75,7 @@ snapcrafts:
       - source: LICENSE
         destination: /usr/share/doc/makemkv/copyright
         mode: 0644
-    publish: false
+    publish: true
 
 brews:
   - name: mkvbot

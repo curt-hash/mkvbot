@@ -36,7 +36,7 @@ brew install mkvbot
 
 ### Snap
 
-_This is not working yet (pending name registration)._
+_This is not working yet (pending classic confinement approval)._
 
 ```
 snap install mkvbot --classic
