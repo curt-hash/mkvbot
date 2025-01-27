@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"strconv"
 	"strings"
 	"sync"
@@ -17,8 +18,9 @@ import (
 )
 
 const (
-	userInputPageName = "userInputPage"
-	logsPageName      = "logsPage"
+	userInputPageName   = "userInputPage"
+	chooseTitlePageName = "chooseTitlePage"
+	logsPageName        = "logsPage"
 
 	progressBarFullChar  = '█'
 	progressBarEmptyChar = '░'
@@ -34,6 +36,7 @@ type textUserInterface struct {
 	statusBox *statusBox
 
 	// Left
+	leftFlex         *tview.Flex
 	driveInfoBox     *tview.TextView
 	discInfoBox      *tview.TextView
 	movieMetadataBox *tview.TextView
@@ -76,7 +79,7 @@ func newTextUserInterface(beeper *beeper) *textUserInterface {
 	movieMetadataBox := tview.NewTextView().SetWrap(false)
 	movieMetadataBox.SetBorder(true).SetTitle("Movie Metadata")
 
-	titleInfoBox := tview.NewTextView().SetWrap(false)
+	titleInfoBox := tview.NewTextView().SetWrap(true)
 	titleInfoBox.SetBorder(true).SetTitle("Title Information")
 
 	userInputIntroText := tview.NewTextView().SetWrap(true)
@@ -98,22 +101,19 @@ func newTextUserInterface(beeper *beeper) *textUserInterface {
 		AddPage(logsPageName, logBox, true, true)
 	pages.SetBorder(true)
 
+	leftFlex := tview.NewFlex().
+		SetDirection(tview.FlexRow).
+		AddItem(driveInfoBox, 4, 0, false).
+		AddItem(discInfoBox, 10, 0, false).
+		AddItem(movieMetadataBox, 5, 0, false).
+		AddItem(titleInfoBox, 0, 40, false)
+
 	flex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
 		AddItem(statusBox.box, 7, 0, false).
 		AddItem(
 			tview.NewFlex().
-				AddItem(
-					tview.NewFlex().
-						SetDirection(tview.FlexRow).
-						AddItem(driveInfoBox, 4, 0, false).
-						AddItem(discInfoBox, 0, 20, false).
-						AddItem(movieMetadataBox, 5, 0, false).
-						AddItem(titleInfoBox, 0, 40, false),
-					0,
-					40,
-					false,
-				).
+				AddItem(leftFlex, 0, 40, false).
 				AddItem(pages, 0, 60, false),
 			0,
 			80,
@@ -131,6 +131,7 @@ func newTextUserInterface(beeper *beeper) *textUserInterface {
 
 		statusBox: statusBox,
 
+		leftFlex:         leftFlex,
 		driveInfoBox:     driveInfoBox,
 		discInfoBox:      discInfoBox,
 		movieMetadataBox: movieMetadataBox,
@@ -191,6 +192,8 @@ func (t *textUserInterface) setDiscInfo(info makemkvcon.Info) {
 		for _, item := range info {
 			fmt.Fprintln(w, item)
 		}
+
+		t.leftFlex.ResizeItem(t.discInfoBox, len(info)+2, 0)
 	})
 }
 
@@ -209,8 +212,9 @@ func (t *textUserInterface) getMovieTitleForSearch(ctx context.Context, q string
 
 		t.pages.SwitchToPage(userInputPageName)
 		t.SetFocus(t.pages)
-		t.beep()
 	})
+
+	t.beep()
 
 	select {
 	case <-continueChan:
@@ -254,8 +258,9 @@ func (t *textUserInterface) getMovieMetadata(ctx context.Context, md *moviedb.Me
 
 		t.pages.SwitchToPage(userInputPageName)
 		t.SetFocus(t.pages)
-		t.beep()
 	})
+
+	t.beep()
 
 	select {
 	case <-continueChan:
@@ -285,81 +290,79 @@ func (t *textUserInterface) setMovieMetadata(md *moviedb.Metadata) {
 func (t *textUserInterface) getBestTitle(ctx context.Context, choices []*makemkvcon.Title) (*makemkvcon.Title, error) {
 	continueChan := make(chan struct{})
 
-	t.QueueUpdateDraw(func() {
-		t.userInputIntroText.SetText("Heuristics identified multiple best titles. ¯\\_(ツ)_/¯\n\nChoose a title to backup and then hit Continue.")
-		t.userInputForm.Clear(true)
-
-		var (
-			buf          strings.Builder
-			choiceLabels []string
-		)
-		for i, title := range choices {
-			fmt.Fprintf(&buf, "Title %d\n\n", title.Index)
-
-			attrs := []defs.Attr{
-				defs.TreeInfo,
-				defs.MetadataLanguageName,
-				defs.ChapterCount,
-				defs.Duration,
-				defs.DiskSize,
-				defs.AngleInfo,
-				defs.SegmentsMap,
-				defs.Comment,
+	var index int
+	table := tview.NewTable().
+		SetSelectable(true, false).
+		SetSelectionChangedFunc(func(r, c int) {
+			index = r - 1
+			if index >= 0 && index < len(choices) {
+				t.setTitleInfoFunc(choices[index])()
 			}
-			for _, attr := range attrs {
-				v, err := title.GetAttr(attr)
-				if err != nil {
-					v = err.Error()
-				}
-				fmt.Fprintf(&buf, "%s: %s\n", attr.String(), v)
-			}
-
-			fmt.Fprintf(&buf, "\nStreams (%d):\n", len(title.Streams))
-			for i, stream := range title.Streams {
-				treeInfo, _ := stream.GetAttr(defs.TreeInfo)
-
-				fmt.Fprintf(&buf, " %d. ", i)
-				typ, _ := stream.GetAttr(defs.Type)
-				switch typ {
-				case "Video":
-					size, _ := stream.GetAttr(defs.VideoSize)
-					bitrate, _ := stream.GetAttr(defs.Bitrate)
-					fmt.Fprintf(&buf, "Video (%s, %s @ %s)", treeInfo, size, bitrate)
-				case "Audio":
-					fmt.Fprintf(&buf, "Audio (%s)", treeInfo)
-				case "Subtitles":
-					lang, _ := stream.GetAttr(defs.LangName)
-					fmt.Fprintf(&buf, "Subtitles (%s)", lang)
-				}
-				fmt.Fprintln(&buf)
-			}
-
-			label := strconv.Itoa(i + 1)
-			h := len(attrs) + len(title.Streams) + 5
-			t.userInputForm.AddTextView(label, buf.String(), 0, h, false, false)
-			choiceLabels = append(choiceLabels, label)
-		}
-
-		t.userInputForm.AddDropDown("Choice", choiceLabels, -1, nil)
-		t.userInputForm.AddButton("Continue", func() {
+		}).
+		SetSelectedFunc(func(r, c int) {
+			index = r - 1
 			close(continueChan)
 		})
 
-		t.pages.SwitchToPage(userInputPageName)
+	attrs := []defs.Attr{
+		defs.TreeInfo,
+		defs.MetadataLanguageName,
+		defs.ChapterCount,
+		defs.Duration,
+		defs.DiskSize,
+		defs.AngleInfo,
+		defs.SegmentsMap,
+		defs.Comment,
+	}
+
+	header := []string{"Index"}
+	for _, attr := range attrs {
+		header = append(header, attr.String())
+	}
+	header = append(header, "StreamCount")
+	for i, s := range header {
+		table.SetCell(0, i, tview.NewTableCell(s).SetSelectable(false).SetExpansion(1))
+	}
+
+	for i, title := range choices {
+		r := i + 1
+		table.SetCellSimple(r, 0, strconv.Itoa(title.Index))
+		for j, attr := range attrs {
+			table.SetCellSimple(r, j+1, title.GetAttrDefault(attr, "-"))
+		}
+		table.SetCellSimple(r, len(attrs)+1, strconv.Itoa(len(title.Streams)))
+	}
+
+	flex := tview.NewFlex().
+		SetDirection(tview.FlexRow).
+		AddItem(
+			tview.NewTextView().
+				SetWrap(true).
+				SetText("Heuristics identified multiple best titles. ¯\\_(ツ)_/¯\n\nInformation about the highlighted title is shown to the left. Use the arrow keys to change the highlighted title and scroll the table. Press Enter to choose the highlighted title."),
+			5,
+			0,
+			false,
+		).
+		AddItem(table, 0, 100, true)
+
+	t.setTitleInfo(choices[0])
+	t.QueueUpdateDraw(func() {
+		t.pages.AddAndSwitchToPage(chooseTitlePageName, flex, true)
 		t.SetFocus(t.pages)
-		t.beep()
 	})
+
+	t.beep()
 
 	select {
 	case <-continueChan:
 		t.QueueUpdateDraw(func() {
+			t.pages.RemovePage(chooseTitlePageName)
 			t.pages.SwitchToPage(logsPageName)
 		})
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
 
-	index, _ := t.userInputForm.GetFormItemByLabel("Choice").(*tview.DropDown).GetCurrentOption()
 	if index < 0 || index >= len(choices) {
 		return nil, fmt.Errorf("invalid choice")
 	}
@@ -367,44 +370,20 @@ func (t *textUserInterface) getBestTitle(ctx context.Context, choices []*makemkv
 	return choices[index], nil
 }
 
-func (t *textUserInterface) setTitleInfo(title *makemkvcon.Title) {
-	t.QueueUpdateDraw(func() {
+func (t *textUserInterface) setTitleInfoFunc(title *makemkvcon.Title) func() {
+	return func() {
 		w := t.titleInfoBox.BatchWriter()
 		defer w.Close()
+
 		w.Clear()
-
-		if title == nil {
-			return
+		if title != nil {
+			writeTitleInfo(w, title)
 		}
+	}
+}
 
-		fmt.Fprintf(w, "Title %d\n\n", title.Index)
-
-		for _, attr := range title.Info {
-			fmt.Fprintf(w, "%s: %s\n", defs.Attr(attr.ID), attr.Value)
-		}
-
-		fmt.Fprintf(w, "\nStreams (%d):\n", len(title.Streams))
-		for i, stream := range title.Streams {
-			treeInfo, _ := stream.GetAttr(defs.TreeInfo)
-
-			fmt.Fprintf(w, " %d. ", i)
-			typ, _ := stream.GetAttr(defs.Type)
-			switch typ {
-			case "Video":
-				size, _ := stream.GetAttr(defs.VideoSize)
-				bitrate, _ := stream.GetAttr(defs.Bitrate)
-				fmt.Fprintf(w, "Video (%s, %s @ %s)", treeInfo, size, bitrate)
-			case "Audio":
-				fmt.Fprintf(w, "Audio (%s)", treeInfo)
-			case "Subtitles":
-				lang, _ := stream.GetAttr(defs.LangName)
-				fmt.Fprintf(w, "Subtitles (%s)", lang)
-			default:
-				fmt.Fprintf(w, "%s", typ)
-			}
-			fmt.Fprintln(w)
-		}
-	})
+func (t *textUserInterface) setTitleInfo(title *makemkvcon.Title) {
+	t.QueueUpdateDraw(t.setTitleInfoFunc(title))
 }
 
 type statusBox struct {
@@ -472,5 +451,66 @@ func (b *statusBox) update() {
 		_, _ = w.Write(buf.Bytes())
 
 		fmt.Fprintf(w, " %3d%%", int(b.progress*100))
+	}
+}
+
+func writeTitleInfo(w io.Writer, title *makemkvcon.Title) {
+	fmt.Fprintf(w, "Title %d\n\n", title.Index)
+
+	for _, attr := range title.Info {
+		if attr.ID == defs.PanelTitle {
+			continue
+		}
+
+		fmt.Fprintf(w, "%s: %s\n", defs.Attr(attr.ID), attr.Value)
+	}
+	fmt.Fprintf(w, "StreamCount: %d\n", len(title.Streams))
+
+	audioStreamCount := 0
+	audioLanguagesByType := make(map[string][]string)
+	subtitlesStreamCount := 0
+	subtitlesByLanguage := make(map[string]int)
+	for _, stream := range title.Streams {
+		treeInfo := stream.GetAttrDefault(defs.TreeInfo, "-")
+
+		typ := stream.GetAttrDefault(defs.Type, "")
+		switch typ {
+		case "Video":
+			size := stream.GetAttrDefault(defs.VideoSize, "unknown size")
+			bitrate := stream.GetAttrDefault(defs.Bitrate, "unknown bit rate")
+			if bitrate == "" {
+				bitrate = "unknown bit rate"
+			}
+			fmt.Fprintf(w, "\nVideo: %s (%s @ %s)\n", treeInfo, size, bitrate)
+		case "Audio":
+			audioStreamCount++
+
+			codec := stream.GetAttrDefault(defs.CodecLong, "Unknown Codec")
+			layout := stream.GetAttrDefault(defs.AudioChannelLayoutName, "Unknown Layout")
+			lang := stream.GetAttrDefault(defs.LangName, "Unknown")
+			key := fmt.Sprintf("%s %s", codec, layout)
+			audioLanguagesByType[key] = append(audioLanguagesByType[key], lang)
+		case "Subtitles":
+			subtitlesStreamCount++
+
+			lang := stream.GetAttrDefault(defs.LangName, "Unknown")
+			if n, ok := subtitlesByLanguage[lang]; ok {
+				subtitlesByLanguage[lang] = n + 1
+			} else {
+				subtitlesByLanguage[lang] = 1
+			}
+		}
+	}
+
+	fmt.Fprintf(w, "\nAudio (%d streams):\n", audioStreamCount)
+	for key, langs := range audioLanguagesByType {
+		fmt.Fprintf(w, "  * %s (%s)\n", key, strings.Join(langs, ", "))
+	}
+
+	if len(subtitlesByLanguage) > 0 {
+		fmt.Fprintf(w, "\nSubtitles (%d streams):\n", subtitlesStreamCount)
+		for lang, count := range subtitlesByLanguage {
+			fmt.Fprintf(w, "  * %s (%d)\n", lang, count)
+		}
 	}
 }
