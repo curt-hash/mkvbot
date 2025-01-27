@@ -71,6 +71,15 @@ func (info Info) GetAttr(id defs.Attr) (string, error) {
 	return "", ErrNotFound
 }
 
+func (info Info) GetAttrDefault(id defs.Attr, defaultValue string) string {
+	v, err := info.GetAttr(id)
+	if err != nil {
+		return defaultValue
+	}
+
+	return v
+}
+
 func (info Info) GetAttrInt(id defs.Attr) (int, error) {
 	v, err := info.GetAttr(id)
 	if err != nil {
