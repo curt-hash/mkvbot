@@ -7,7 +7,7 @@ project_name: mkvbot
 
 before:
   hooks:
-    - go install golang.org/x/tools/cmd/stringer@latest 
+    - go install golang.org/x/tools/cmd/stringer@latest
     - go generate ./...
 
 builds:
@@ -37,7 +37,7 @@ archives:
         formats: zip
 
 changelog:
-  sort: asc
+  sort:
   filters:
     exclude:
       - "^docs:"
