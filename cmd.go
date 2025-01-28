@@ -17,6 +17,7 @@ const (
 	minLengthFlagName     = "minlength"
 	outputDirFlagName     = "output-dir"
 	quietFlagName         = "quiet"
+	askForTitleFlagName   = "ask-title"
 )
 
 func newCLICommand() *cli.Command {
@@ -69,6 +70,11 @@ func newCLICommand() *cli.Command {
 				Name:    quietFlagName,
 				Usage:   "do not beep",
 				Aliases: []string{"q"},
+			},
+			&cli.BoolFlag{
+				Name:    askForTitleFlagName,
+				Usage:   "ask you to choose the best title",
+				Aliases: []string{"a"},
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
