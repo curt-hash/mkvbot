@@ -3,32 +3,33 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"time"
 )
 
-func setDefaultLogger(w io.Writer, debug bool) {
+func setDefaultLogger(writers []io.Writer, debug bool) {
 	level := slog.LevelInfo
 	if debug {
 		level = slog.LevelDebug
 	}
 
-	slog.SetDefault(slog.New(newLogHandler(w, level)))
+	slog.SetDefault(slog.New(newLogHandler(writers, level)))
 }
 
 type logHandler struct {
-	w     io.Writer
-	level slog.Leveler
+	writers []io.Writer
+	level   slog.Leveler
 }
 
 var _ slog.Handler = (*logHandler)(nil)
 
-func newLogHandler(w io.Writer, level slog.Leveler) *logHandler {
+func newLogHandler(writers []io.Writer, level slog.Leveler) *logHandler {
 	return &logHandler{
-		w:     w,
-		level: level,
+		writers: writers,
+		level:   level,
 	}
 }
 
@@ -57,8 +58,14 @@ func (h *logHandler) Handle(_ context.Context, r slog.Record) error {
 	}
 	buf.WriteByte('\n')
 
-	_, err := h.w.Write(buf.Bytes())
-	return err
+	var errs error
+	for _, w := range h.writers {
+		if _, err := w.Write(buf.Bytes()); err != nil {
+			errs = errors.Join(errs, err)
+		}
+	}
+
+	return errs
 }
 
 func (h *logHandler) WithAttrs([]slog.Attr) slog.Handler {
