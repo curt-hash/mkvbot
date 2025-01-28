@@ -25,8 +25,12 @@ func main() {
 
 func run(ctx context.Context, cmd *cli.Command) error {
 	if cmd.Bool(createProfileFlagName) {
-		if err := os.WriteFile("profile.xml", profileBytes, 0644); err != nil {
-			return fmt.Errorf("create profile.xml: %w", err)
+		name := "profile.xml"
+		if _, err := os.Stat(name); err == nil {
+			return fmt.Errorf("create %q: file exists", name)
+		}
+		if err := os.WriteFile(name, profileBytes, 0644); err != nil {
+			return fmt.Errorf("create %q: %w", name, err)
 		}
 	}
 
