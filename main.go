@@ -60,6 +60,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 		debug:                      cmd.Bool(debugFlagName),
 		quiet:                      cmd.Bool(quietFlagName),
 		bestTitleHeuristicsWeights: weights,
+		askForTitle:                cmd.Bool(askForTitleFlagName),
 	}
 
 	app, err := newApplication(cfg)

@@ -26,6 +26,7 @@ type (
 		debug                      bool
 		quiet                      bool
 		bestTitleHeuristicsWeights map[string]int64
+		askForTitle                bool
 	}
 
 	application struct {
@@ -193,9 +194,16 @@ func (app *application) tryBackupBestTitle(ctx context.Context, drive *makemkvco
 	app.tui.setMovieMetadata(movieMetadata)
 	fileName := makeFileName(movieMetadata)
 
-	var title *makemkvcon.Title
+	var (
+		title *makemkvcon.Title
+		best  []*makemkvcon.Title
+	)
 	app.tui.setStatus("Finding best title")
-	best := findBestTitle(disc, app.cfg.bestTitleHeuristicsWeights)
+	if app.cfg.askForTitle {
+		best = disc.Titles
+	} else {
+		best = findBestTitle(disc, app.cfg.bestTitleHeuristicsWeights)
+	}
 	switch len(best) {
 	case 0:
 		return fmt.Errorf("no best titles")
