@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -27,12 +28,14 @@ type (
 		quiet                      bool
 		bestTitleHeuristicsWeights map[string]int64
 		askForTitle                bool
+		logFilePath                string
 	}
 
 	application struct {
-		cfg *applicationConfig
-		con *makemkvcon.MakeMKVCon
-		tui *textUserInterface
+		cfg     *applicationConfig
+		con     *makemkvcon.MakeMKVCon
+		tui     *textUserInterface
+		logFile *os.File
 	}
 )
 
@@ -61,16 +64,33 @@ func newApplication(cfg *applicationConfig) (*application, error) {
 	}
 
 	tui := newTextUserInterface(newBeeper(!cfg.quiet))
-	setDefaultLogger(tui.logBox, cfg.debug)
+
+	logWriters := []io.Writer{tui.logBox}
+	var logFile *os.File
+	if cfg.logFilePath != "" {
+		if logFile, err = os.OpenFile(cfg.logFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644); err != nil {
+			return nil, fmt.Errorf("open %q: %w", cfg.logFilePath, err)
+		}
+
+		logWriters = append(logWriters, logFile)
+	}
+	setDefaultLogger(logWriters, cfg.debug)
 
 	return &application{
-		cfg: cfg,
-		con: con,
-		tui: tui,
+		cfg:     cfg,
+		con:     con,
+		tui:     tui,
+		logFile: logFile,
 	}, nil
 }
 
-func (app *application) run(ctx context.Context) error {
+func (app *application) run(ctx context.Context) (err error) {
+	defer func() {
+		if app.logFile != nil {
+			err = errors.Join(err, app.logFile.Close())
+		}
+	}()
+
 	ctx, cancel := context.WithCancel(ctx)
 	go func() {
 		app.tui.waitForInterrupt()
@@ -80,7 +100,7 @@ func (app *application) run(ctx context.Context) error {
 	var tasks errgroup.Group
 	tasks.Go(app.tui.run)
 
-	err := app.doBackupLoop(ctx)
+	err = app.doBackupLoop(ctx)
 	app.tui.Stop()
 	return errors.Join(err, tasks.Wait())
 }

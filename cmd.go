@@ -18,6 +18,7 @@ const (
 	outputDirFlagName     = "output-dir"
 	quietFlagName         = "quiet"
 	askForTitleFlagName   = "ask-title"
+	logFileFlagName       = "log"
 )
 
 func newCLICommand() *cli.Command {
@@ -75,6 +76,11 @@ func newCLICommand() *cli.Command {
 				Name:    askForTitleFlagName,
 				Usage:   "ask you to choose the best title",
 				Aliases: []string{"a"},
+			},
+			&cli.StringFlag{
+				Name:    logFileFlagName,
+				Usage:   "append log messages to `FILE`",
+				Aliases: []string{"L"},
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {

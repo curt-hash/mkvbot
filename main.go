@@ -61,6 +61,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 		quiet:                      cmd.Bool(quietFlagName),
 		bestTitleHeuristicsWeights: weights,
 		askForTitle:                cmd.Bool(askForTitleFlagName),
+		logFilePath:                cmd.String(logFileFlagName),
 	}
 
 	app, err := newApplication(cfg)
