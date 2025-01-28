@@ -245,8 +245,12 @@ func (app *application) getMovieMetadata(ctx context.Context, disc *makemkvcon.D
 
 func (app *application) backupTitle(ctx context.Context, drive *makemkvcon.DriveScanLine, title *makemkvcon.Title, fileName string) error {
 	dstDir := filepath.Join(app.cfg.outputDirPath, fileName)
-	app.tui.setStatus("Backing up title to %s", dstDir)
+	dstPath := filepath.Join(dstDir, fmt.Sprintf("%s.mkv", fileName))
+	if _, err := os.Stat(dstPath); err == nil {
+		return fmt.Errorf("output file exists: %q", dstPath)
+	}
 
+	app.tui.setStatus("Backing up title to %s", dstDir)
 	seq, err := app.con.BackupTitle(ctx, drive.Index, title.Index, dstDir)
 	if err != nil {
 		return fmt.Errorf("backup title %d to %q: %w", title.Index, dstDir, err)
@@ -280,7 +284,6 @@ func (app *application) backupTitle(ctx context.Context, drive *makemkvcon.Drive
 		return fmt.Errorf("backup file not found at expected path %q: %w", expectedPath, err)
 	}
 
-	dstPath := filepath.Join(dstDir, fmt.Sprintf("%s.mkv", fileName))
 	if err := os.Rename(expectedPath, dstPath); err != nil {
 		return fmt.Errorf("rename %q to %q: %w", expectedPath, dstPath, err)
 	}
