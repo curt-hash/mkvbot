@@ -63,20 +63,6 @@ nfpms:
         file_info:
           mode: 0644
 
-snapcrafts:
-  - title: mkvbot
-    summary: Automation for makemkv
-    description: TUI application that streamlines ripping the best title with makemkv.
-    grade: devel
-    confinement: classic
-    license: MIT
-    base: core22
-    extra_files:
-      - source: LICENSE
-        destination: /usr/share/doc/makemkv/copyright
-        mode: 0644
-    publish: true
-
 brews:
   - name: mkvbot
     repository:

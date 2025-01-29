@@ -34,14 +34,6 @@ brew tap curt-hash/homebrew-mkvbot
 brew install mkvbot
 ```
 
-### Snap
-
-_This is not working yet (pending classic confinement approval)._
-
-```
-snap install mkvbot --classic
-```
-
 ## Usage
 
 `mkvbot` is a terminal program with a text-based user interface (TUI). Open a
