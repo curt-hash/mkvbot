@@ -14,6 +14,7 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -30,6 +31,7 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -37,7 +39,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - names: Configure Environment
+      - name: Configure Environment
         run: go env -w CGO_ENABLED=0
       - cmds: Install Task
         uses: arduino/setup-task@v2
