@@ -54,6 +54,8 @@ jobs:
     name: Check GoReleaser
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
       - name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
