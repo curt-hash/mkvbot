@@ -34,6 +34,12 @@ brew tap curt-hash/homebrew-mkvbot
 brew install mkvbot
 ```
 
+### Go Install
+
+```sh
+go install github.com/curt-hash/mkvbot@latest # or a tag like @v0.3.0
+```
+
 ## Usage
 
 `mkvbot` is a terminal program with a text-based user interface (TUI). Open a
