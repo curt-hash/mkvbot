@@ -33,4 +33,4 @@ linters-settings:
   unused:
     go: "1.23"
 run:
-  timeout: 2m
+  timeout: 5m
