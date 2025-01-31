@@ -172,7 +172,7 @@ func (c *MakeMKVCon) runCmd(ctx context.Context, args ...string) (iter.Seq2[Line
 		defaultArgs = append(defaultArgs, fmt.Sprintf("--profile=%s", c.cfg.ProfilePath))
 	}
 
-	cmd := exec.CommandContext(ctx, c.cfg.ExePath, slices.Concat(defaultArgs, args)...) // nolint:gosec
+	cmd := exec.CommandContext(ctx, c.cfg.ExePath, slices.Concat(defaultArgs, args)...)
 	cmd.WaitDelay = time.Second
 
 	stdout, err := cmd.StdoutPipe()
