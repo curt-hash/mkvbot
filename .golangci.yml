@@ -32,3 +32,5 @@ linters-settings:
       - nilness
   unused:
     go: "1.23"
+run:
+  timeout: 2m
