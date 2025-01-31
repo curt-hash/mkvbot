@@ -1,0 +1,36 @@
+linters:
+  disable-all: true
+  enable:
+    - containedctx
+    - errcheck
+    - errname
+    - exptostd
+    - goconst
+    - gocyclo
+    - gofumpt
+    - goimports
+    - gosec
+    - gosimple
+    - govet
+    - iface
+    - ineffassign
+    - intrange
+    - ireturn
+    - loggercheck
+    - misspell
+    - predeclared
+    - recvcheck
+    - revive
+    - staticcheck
+    - testpackage
+    - thelper
+    - unconvert
+    - unparam
+    - unused
+    - whitespace
+linters-settings:
+  govet:
+    enable:
+      - nilness
+  unused:
+    go: "1.23"

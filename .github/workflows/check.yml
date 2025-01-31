@@ -1,0 +1,69 @@
+name: Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Lint
+        uses: golangci/golangci-lint-action@v6
+  test:
+    name: Test
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - names: Configure Environment
+        run: go env -w CGO_ENABLED=0
+      - cmds: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+      - name: Test
+        run: task test
+  diff:
+    name: Check for Diff
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - names: Configure Environment
+        run: go env -w CGO_ENABLED=0
+      - cmds: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+      - name: Tidy
+        run: task tidy
+      - name: Generate
+        run: task generate
+      - name: Check for Diff
+        run: test -z "$(git status --porcelain)"

@@ -2,58 +2,64 @@ version: '3'
 
 tasks:
   default:
-    cmds:
-      - task: build_windows
-
-  build_windows:
+    desc: "Build a windows amd64 binary"
     cmds:
       - task: build_single_target
         vars:
           GOOS: "windows"
           GOARCH: "amd64"
 
-  build_linux:
-    cmds:
-      - task: build_single_target
-        vars:
-          GOOS: "linux"
-          GOARCH: "amd64"
-
-  build_darwin:
-    cmds:
-      - task: build_single_target
-        vars:
-          GOOS: "darwin"
-          GOARCH: "arm64"
-
   build_single_target:
+    desc: "Build a binary based on GOOS and GOARCH env vars"
     env:
-      GOOS: "{{.GOOS}}"
-      GOARCH: "{{.GOARCH}}"
+      GOOS: "{{ .GOOS }}"
+      GOARCH: "{{ .GOARCH }}"
     cmds:
       - goreleaser build --snapshot --single-target --clean
 
   release_local:
+    desc: "Build a complete release, but do not publish"
     cmds:
+      - goreleaser check
       - goreleaser release --snapshot --clean
 
   release:
+    desc: "Build and publish a release"
     cmds:
       - goreleaser check
       - goreleaser release --clean
 
   changelog:
+    desc: "Summarize commits since the last tag"
     cmds:
       - git log $(git describe --tags --abbrev=0)..HEAD --oneline
 
   generate:
+    desc: "Generate code"
     cmds:
       - go generate ./...
 
   tidy:
+    desc: "Update go.mod"
     cmds:
       - go mod tidy
 
+  lint:
+    desc: "Run linters"
+    cmds:
+      - golangci-lint run
+
+  test:
+    desc: "Run tests"
+    cmds:
+      - go test ./...
+      - goreleaser check
+
+  check:
+    desc: "Run all checks"
+    deps: [lint, test]
+
   clean:
+    desc: "Clean up local build artifacts"
     cmds:
       - rm -rf dist
