@@ -24,6 +24,7 @@ jobs:
           go-version-file: go.mod
       - name: Lint
         uses: golangci/golangci-lint-action@v6
+
   test:
     name: Test
     strategy:
@@ -46,14 +47,22 @@ jobs:
         with:
           version: 3.x
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test
+        run: task test
+
+  goreleaser:
+    name: Check GoReleaser
+    runs-on: ubuntu-latest
+    steps:
       - name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           install-only: true
-      - name: Test
-        run: task test
+      - name: Check GoReleaser
+        run: goreleaser check
+
   diff:
-    name: Check for Diff
+    name: Check Diff
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -69,11 +78,11 @@ jobs:
         with:
           version: 3.x
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Tidy
-        run: task tidy
       - name: Install stringer
         run: go install golang.org/x/tools/cmd/stringer@latest
+      - name: Tidy
+        run: task tidy
       - name: Generate
         run: task generate
-      - name: Check for Diff
+      - name: Check Diff
         run: test -z "$(git status --porcelain)"

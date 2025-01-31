@@ -53,11 +53,12 @@ tasks:
     desc: "Run tests"
     cmds:
       - go test ./...
-      - goreleaser check
 
   check:
     desc: "Run all checks"
     deps: [lint, test]
+    cmds:
+      - goreleaser check
 
   clean:
     desc: "Clean up local build artifacts"
