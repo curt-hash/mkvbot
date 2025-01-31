@@ -7,7 +7,7 @@ linters:
     - exptostd
     - goconst
     - gocyclo
-    - gofumpt
+    - gofmt
     - goimports
     - gosec
     - gosimple
@@ -15,7 +15,6 @@ linters:
     - iface
     - ineffassign
     - intrange
-    - ireturn
     - loggercheck
     - misspell
     - predeclared

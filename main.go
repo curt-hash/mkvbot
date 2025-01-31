@@ -29,7 +29,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 		if _, err := os.Stat(name); err == nil {
 			return fmt.Errorf("create %q: file exists", name)
 		}
-		if err := os.WriteFile(name, profileBytes, 0644); err != nil {
+		if err := os.WriteFile(name, profileBytes, 0600); err != nil {
 			return fmt.Errorf("create %q: %w", name, err)
 		}
 	}
@@ -51,7 +51,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 
 	cfg := &applicationConfig{
 		outputDirPath: cmd.String(outputDirFlagName),
-		makemkvConfig: &makemkvcon.MakeMKVConConfig{
+		makemkvConfig: &makemkvcon.Config{
 			ExePath:          cmd.String(makemkvconFlagName),
 			ProfilePath:      profilePath,
 			ReadCacheSizeMB:  cmd.Int(cacheFlagName),

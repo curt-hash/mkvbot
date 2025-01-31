@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 )
 
-func find_exe() (string, error) {
+func FindExe() (string, error) {
 	exe := "makemkvcon64.exe"
 	if path, err := exec.LookPath(exe); err == nil {
 		return path, nil

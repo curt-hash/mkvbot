@@ -26,7 +26,7 @@ type InfoLine struct {
 }
 
 func (l *InfoLine) String() string {
-	return fmt.Sprintf("%s: %s", defs.Attr(l.ID), l.Value)
+	return fmt.Sprintf("%s: %s", l.ID, l.Value)
 }
 
 func parseInfoLine(numPrefixTokens int, s string) (*InfoLine, error) {
