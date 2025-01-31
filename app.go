@@ -23,7 +23,7 @@ import (
 type (
 	applicationConfig struct {
 		outputDirPath              string
-		makemkvConfig              *makemkvcon.MakeMKVConConfig
+		makemkvConfig              *makemkvcon.Config
 		debug                      bool
 		quiet                      bool
 		bestTitleHeuristicsWeights map[string]int64

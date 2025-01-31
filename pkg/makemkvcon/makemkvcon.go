@@ -18,14 +18,14 @@ import (
 
 var validate = validator.New(validator.WithRequiredStructEnabled())
 
-type MakeMKVConConfig struct {
+type Config struct {
 	ExePath          string ``                 // path to makemkvcon executable
 	ProfilePath      string ``                 // path to makemkv profile XML
 	ReadCacheSizeMB  int64  `validate:"min=1"` // --cache argument
 	MinLengthSeconds int64  `validate:"min=1"` // --minlength argument
 }
 
-func (cfg *MakeMKVConConfig) Validate() error {
+func (cfg *Config) Validate() error {
 	if !fileExists(cfg.ExePath) {
 		return fmt.Errorf("file %q not found", cfg.ExePath)
 	}
@@ -38,13 +38,13 @@ func (cfg *MakeMKVConConfig) Validate() error {
 }
 
 type MakeMKVCon struct {
-	cfg *MakeMKVConConfig
+	cfg *Config
 }
 
-func New(cfg *MakeMKVConConfig) (*MakeMKVCon, error) {
+func New(cfg *Config) (*MakeMKVCon, error) {
 	if cfg.ExePath == "" {
 		var err error
-		if cfg.ExePath, err = find_exe(); err != nil {
+		if cfg.ExePath, err = FindExe(); err != nil {
 			return nil, fmt.Errorf("find makemkvcon executable")
 		}
 	}
@@ -172,7 +172,7 @@ func (c *MakeMKVCon) runCmd(ctx context.Context, args ...string) (iter.Seq2[Line
 		defaultArgs = append(defaultArgs, fmt.Sprintf("--profile=%s", c.cfg.ProfilePath))
 	}
 
-	cmd := exec.CommandContext(ctx, c.cfg.ExePath, slices.Concat(defaultArgs, args)...)
+	cmd := exec.CommandContext(ctx, c.cfg.ExePath, slices.Concat(defaultArgs, args)...) // nolint:gosec
 	cmd.WaitDelay = time.Second
 
 	stdout, err := cmd.StdoutPipe()

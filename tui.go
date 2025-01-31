@@ -293,13 +293,13 @@ func (t *textUserInterface) getBestTitle(ctx context.Context, choices []*makemkv
 	var index int
 	table := tview.NewTable().
 		SetSelectable(true, false).
-		SetSelectionChangedFunc(func(r, c int) {
+		SetSelectionChangedFunc(func(r, _ int) {
 			index = r - 1
 			if index >= 0 && index < len(choices) {
 				t.setTitleInfoFunc(choices[index])()
 			}
 		}).
-		SetSelectedFunc(func(r, c int) {
+		SetSelectedFunc(func(r, _ int) {
 			index = r - 1
 			close(continueChan)
 		})
@@ -462,7 +462,7 @@ func writeTitleInfo(w io.Writer, title *makemkvcon.Title) {
 			continue
 		}
 
-		fmt.Fprintf(w, "%s: %s\n", defs.Attr(attr.ID), attr.Value)
+		fmt.Fprintf(w, "%s: %s\n", attr.ID, attr.Value)
 	}
 	fmt.Fprintf(w, "StreamCount: %d\n", len(title.Streams))
 
