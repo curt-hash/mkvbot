@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
 	"time"
 
 	"github.com/curt-hash/mkvbot/pkg/eject"
@@ -320,8 +319,7 @@ func (app *application) backupTitle(ctx context.Context, drive *makemkvcon.Drive
 }
 
 func makeFileName(metadata *moviedb.Metadata) string {
-	name := strings.ReplaceAll(metadata.Name, ":", " -")
-	return fmt.Sprintf("%s (%d) {%s}", name, metadata.Year, metadata.Tag)
+	return fmt.Sprintf("%s (%d) {%s}", sanitizeFileName(metadata.Name), metadata.Year, sanitizeFileName(metadata.Tag))
 }
 
 func searchMovieDB(q string) (*moviedb.Metadata, error) {
