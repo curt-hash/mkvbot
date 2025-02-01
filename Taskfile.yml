@@ -60,6 +60,11 @@ tasks:
     cmds:
       - goreleaser check
 
+  godoc:
+    desc: "View go docs locally"
+    cmds:
+      - go run golang.org/x/pkgsite/cmd/pkgsite@latest -open
+
   clean:
     desc: "Clean up local build artifacts"
     cmds:
