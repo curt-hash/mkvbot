@@ -228,14 +228,14 @@ func (t *textUserInterface) getMovieTitleForSearch(ctx context.Context, q string
 	return t.userInputForm.GetFormItemByLabel("Query").(*tview.InputField).GetText(), nil
 }
 
-func (t *textUserInterface) getMovieMetadata(ctx context.Context, md *moviedb.Metadata) (*moviedb.Metadata, error) {
+func (t *textUserInterface) getMovieMetadata(ctx context.Context, md *moviedb.MovieMetadata) (*moviedb.MovieMetadata, error) {
 	continueChan := make(chan struct{})
 
 	t.QueueUpdateDraw(func() {
 		var buf strings.Builder
 		fmt.Fprintf(&buf, "Correct the movie metadata below if necessary and then hit Continue.")
-		if md.Tag != "" {
-			fmt.Fprintf(&buf, "\n\nhttps://www.imdb.com/title/%s/", strings.TrimPrefix(md.Tag, "imdb-"))
+		if md.ID != "" {
+			fmt.Fprintf(&buf, "\n\nhttps://www.imdb.com/title/%s/", strings.TrimPrefix(md.ID, "imdb-"))
 		}
 		t.userInputIntroText.SetText(buf.String())
 		t.userInputForm.
@@ -244,7 +244,7 @@ func (t *textUserInterface) getMovieMetadata(ctx context.Context, md *moviedb.Me
 			AddInputField("Year", strconv.Itoa(md.Year), 4, func(textToCheck string, lastChar rune) bool {
 				return len(textToCheck) <= 4 && unicode.IsDigit(lastChar)
 			}, nil).
-			AddInputField("Tag", md.Tag, 0, nil, nil).
+			AddInputField("Tag", md.ID, 0, nil, nil).
 			AddButton("Continue", func() {
 				yearInput := t.userInputForm.GetFormItemByLabel("Year").(*tview.InputField)
 				var err error
@@ -272,14 +272,14 @@ func (t *textUserInterface) getMovieMetadata(ctx context.Context, md *moviedb.Me
 	}
 
 	md.Name = t.userInputForm.GetFormItemByLabel("Name").(*tview.InputField).GetText()
-	md.Tag = t.userInputForm.GetFormItemByLabel("Tag").(*tview.InputField).GetText()
+	md.ID = t.userInputForm.GetFormItemByLabel("Tag").(*tview.InputField).GetText()
 	return md, nil
 }
 
-func (t *textUserInterface) setMovieMetadata(md *moviedb.Metadata) {
+func (t *textUserInterface) setMovieMetadata(md *moviedb.MovieMetadata) {
 	var s string
 	if md != nil {
-		s = fmt.Sprintf("Name: %s\nYear: %d\nTag: %s", md.Name, md.Year, md.Tag)
+		s = fmt.Sprintf("Name: %s\nYear: %d\nTag: %s", md.Name, md.Year, md.ID)
 	}
 
 	t.QueueUpdateDraw(func() {

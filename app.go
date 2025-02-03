@@ -249,7 +249,7 @@ func (app *application) tryBackupBestTitle(ctx context.Context, drive *makemkv.D
 	return nil
 }
 
-func (app *application) getMovieMetadata(ctx context.Context, disc *makemkv.Disc) (*moviedb.Metadata, error) {
+func (app *application) getMovieMetadata(ctx context.Context, disc *makemkv.Disc) (*moviedb.MovieMetadata, error) {
 	name, err := disc.GetAttr(defs.Name)
 	if err != nil {
 		return nil, fmt.Errorf("get disc attr %s: %w", defs.Name, err)
@@ -264,7 +264,7 @@ func (app *application) getMovieMetadata(ctx context.Context, disc *makemkv.Disc
 	metadata, err := searchMovieDB(q)
 	if err != nil {
 		slog.Warn("movie metadata lookup failed", "err", err)
-		metadata = &moviedb.Metadata{}
+		metadata = &moviedb.MovieMetadata{}
 	}
 
 	return app.tui.getMovieMetadata(ctx, metadata)
@@ -318,14 +318,14 @@ func (app *application) backupTitle(ctx context.Context, drive *makemkv.DriveSca
 	return nil
 }
 
-func makeFileName(metadata *moviedb.Metadata) string {
-	return fmt.Sprintf("%s (%d) {%s}", sanitizeFileName(metadata.Name), metadata.Year, sanitizeFileName(metadata.Tag))
+func makeFileName(metadata *moviedb.MovieMetadata) string {
+	return fmt.Sprintf("%s (%d) {%s}", sanitizeFileName(metadata.Name), metadata.Year, sanitizeFileName(metadata.ID))
 }
 
-func searchMovieDB(q string) (*moviedb.Metadata, error) {
-	results, err := moviedb.NewIMDb().FuzzySearchTitle(q)
+func searchMovieDB(q string) (*moviedb.MovieMetadata, error) {
+	results, err := moviedb.NewIMDb().SearchMovies(q)
 	if err != nil {
-		return nil, fmt.Errorf("fuzzy search %q: %w", q, err)
+		return nil, fmt.Errorf("search for %q: %w", q, err)
 	}
 
 	if len(results) == 0 {
