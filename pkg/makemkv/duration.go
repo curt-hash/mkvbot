@@ -1,17 +1,13 @@
-package makemkvcon
+package makemkv
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"time"
 )
 
-func fileExists(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil
-}
-
+// ParseDuration parses a duration string with hours, minutes and seconds
+// values separated by colons like "1:22:33".
 func ParseDuration(s string) (time.Duration, error) {
 	tokens := strings.Split(s, ":")
 	if n := len(tokens); n > 3 {

@@ -1,4 +1,4 @@
-package makemkvcon
+package makemkv
 
 import (
 	"encoding/csv"
@@ -7,22 +7,25 @@ import (
 	"strings"
 	"time"
 
-	"github.com/curt-hash/mkvbot/pkg/makemkvcon/defs"
+	"github.com/curt-hash/mkvbot/pkg/makemkv/defs"
 )
 
-// From https://makemkv.com/developers/usage.txt:
+// InfoLine is the common representation of the "CINFO", "TINFO" and "SINFO"
+// makemkvcon output lines, which describe an attribute of a disc, title, or
+// stream.
 //
-// CINFO:id,code,value
-// TINFO:id,code,value
-// SINFO:id,code,value
-// id - attribute id, see AP_ItemAttributeId in apdefs.h
-// code - message code if attribute value is a constant string
-// value - attribute value
+// See https://makemkv.com/developers/usage.txt.
 type InfoLine struct {
 	prefix []int
-	ID     defs.Attr `json:"id"`
-	Code   int       `json:"code"`
-	Value  string    `json:"value"`
+
+	// ID is an integer that identifies the attribute.
+	ID defs.Attr
+
+	// Code is an integer that corresponds to Value, if Value is an enumeration.
+	Code int
+
+	// Value is the value of the attribute identified by ID.
+	Value string
 }
 
 func (l *InfoLine) String() string {
@@ -59,8 +62,34 @@ func parseInfoLine(numPrefixTokens int, s string) (*InfoLine, error) {
 	return l, nil
 }
 
+// Info is a slice of related InfoLines.
 type Info []*InfoLine
 
+// GetCode returns the Code of the InfoLine where ID matches id or ErrNotFound
+// if such a line does not exist.
+func (info Info) GetCode(id defs.Attr) (int, error) {
+	for _, infoLine := range info {
+		if infoLine.ID == id {
+			return infoLine.Code, nil
+		}
+	}
+
+	return 0, ErrNotFound
+}
+
+// GetCodeDefault returns the Code of the InfoLine where ID matches id or
+// defaultValue if such a line does not exist.
+func (info Info) GetCodeDefault(id defs.Attr, defaultValue int) int {
+	v, err := info.GetCode(id)
+	if err != nil {
+		return defaultValue
+	}
+
+	return v
+}
+
+// GetAttr returns the Value of the InfoLine where ID matches id or ErrNotFound
+// if such a line does not exist.
 func (info Info) GetAttr(id defs.Attr) (string, error) {
 	for _, infoLine := range info {
 		if infoLine.ID == id {
@@ -71,6 +100,8 @@ func (info Info) GetAttr(id defs.Attr) (string, error) {
 	return "", ErrNotFound
 }
 
+// GetAttrDefault returns the Value of the InfoLine where ID matches id or
+// defaultValue if such a line does not exist.
 func (info Info) GetAttrDefault(id defs.Attr, defaultValue string) string {
 	v, err := info.GetAttr(id)
 	if err != nil {
@@ -80,6 +111,8 @@ func (info Info) GetAttrDefault(id defs.Attr, defaultValue string) string {
 	return v
 }
 
+// GetAttrInto is like GetAttr, except it also attempts to convert the Value to
+// an integer.
 func (info Info) GetAttrInt(id defs.Attr) (int, error) {
 	v, err := info.GetAttr(id)
 	if err != nil {
@@ -94,6 +127,8 @@ func (info Info) GetAttrInt(id defs.Attr) (int, error) {
 	return n, nil
 }
 
+// GetAttrDuration is like GetAttr, except it also attempts to convert the
+// value to a time.Duration.
 func (info Info) GetAttrDuration(id defs.Attr) (time.Duration, error) {
 	v, err := info.GetAttr(id)
 	if err != nil {

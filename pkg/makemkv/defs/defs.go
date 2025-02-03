@@ -1,6 +1,9 @@
+// Package defs defines a subset of attributes and codes used by makemkv to
+// describe discs, titles, and streams.
+//
+// It is based on apdefs.h obtained from the makemkv for Linux source tarball.
+// That file is in the public domain and no copyright is claimed.
 package defs
-
-// Originally from apdefs.h in the makemkv for Linux source tarball.
 
 //go:generate stringer -type=Attr
 type Attr int

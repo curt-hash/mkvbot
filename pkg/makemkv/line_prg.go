@@ -1,4 +1,4 @@
-package makemkvcon
+package makemkv
 
 import (
 	"encoding/csv"
@@ -7,18 +7,14 @@ import (
 	"strings"
 )
 
-// From https://makemkv.com/developers/usage.txt:
-//
-// Current and total progress title
-// PRGC:code,id,name
-// PRGT:code,id,name
-// code - unique message code
-// id - operation sub-id
-// name - name string
+// progressLine is the common representation for makemkvcon "PRGC" and "PRGT"
+// output lines, which describe the current and overall task, respectively.
 type progressLine struct {
-	ID   int    `json:"id"`
-	Code int    `json:"code"`
-	Name string `json:"name"`
+	ID   int
+	Code int
+
+	// Name is the name of the task.
+	Name string
 }
 
 func parseProgressLine(s string) (*progressLine, error) {

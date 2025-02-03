@@ -1,8 +1,12 @@
-package makemkvcon
+package makemkv
 
+// StreamInfoLine represents an "SINFO" makemkvcon output line, which provides
+// information about a stream.
+//
+// See https://makemkv.com/developers/usage.txt.
 type StreamInfoLine struct {
-	TitleIndex  int `json:"title_index"`
-	StreamIndex int `json:"stream_index"`
+	TitleIndex  int
+	StreamIndex int
 
 	*InfoLine
 }
@@ -13,6 +17,8 @@ func (l *StreamInfoLine) Kind() LineKind {
 	return LineKindStreamInfo
 }
 
+// ParseStreamInfoLine parses the string that follows "SINFO:" in the output of
+// makemkvcon.
 func ParseStreamInfoLine(s string) (*StreamInfoLine, error) {
 	l, err := parseInfoLine(2, s)
 	if err != nil {

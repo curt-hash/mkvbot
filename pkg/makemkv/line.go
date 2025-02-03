@@ -1,12 +1,14 @@
-package makemkvcon
+package makemkv
 
 import (
 	"fmt"
 	"strings"
 )
 
+// LineKind enumerates the kinds of lines that makemkvcon outputs.
 type LineKind int
 
+// LineKind constants.
 const (
 	LineKindUnknown LineKind = iota
 	LineKindMessage
@@ -20,10 +22,12 @@ const (
 	LineKindProgressBar
 )
 
+// Line is a makemkvcon output line.
 type Line interface {
 	Kind() LineKind
 }
 
+// ParseLine parses a makemkvcon output line.
 func ParseLine(s string) (Line, error) {
 	before, after, found := strings.Cut(s, ":")
 	if !found {

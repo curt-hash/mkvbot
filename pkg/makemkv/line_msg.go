@@ -1,4 +1,4 @@
-package makemkvcon
+package makemkv
 
 import (
 	"encoding/csv"
@@ -7,22 +7,17 @@ import (
 	"strings"
 )
 
-// From https://makemkv.com/developers/usage.txt:
+// MessageLine represents a makemkvcon "MSG" output line, which is an
+// informational logging line.
 //
-// MSG:code,flags,count,message,format,param0,param1,...
-// code - unique message code, should be used to identify particular string in language-neutral way.
-// flags - message flags, see AP_UIMSG_xxx flags in apdefs.h
-// count - number of parameters
-// message - raw message string suitable for output
-// format - format string used for message. This string is localized and subject to change, unlike message code.
-// paramX - parameter for message
+// See https://makemkv.com/developers/usage.txt.
 type MessageLine struct {
-	Code      int      `json:"code"`
-	Flags     int      `json:"flags"`
-	NumParams int      `json:"num_params"`
-	Message   string   `json:"message"`
-	Format    string   `json:"format"`
-	Params    []string `json:"params"`
+	Code      int
+	Flags     int
+	NumParams int
+	Message   string
+	Format    string
+	Params    []string
 }
 
 var _ Line = (*MessageLine)(nil)
@@ -31,6 +26,8 @@ func (l *MessageLine) Kind() LineKind {
 	return LineKindMessage
 }
 
+// ParseMessageLine parses the string that follows "MSG:" in the output of
+// makemkvcon.
 func ParseMessageLine(s string) (*MessageLine, error) {
 	tokens := strings.SplitN(s, ",", 4)
 	if len(tokens) != 4 {

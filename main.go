@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/curt-hash/mkvbot/pkg/makemkvcon"
+	"github.com/curt-hash/mkvbot/pkg/makemkv"
 	"github.com/urfave/cli/v3"
 )
 
@@ -51,7 +51,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 
 	cfg := &applicationConfig{
 		outputDirPath: cmd.String(outputDirFlagName),
-		makemkvConfig: &makemkvcon.Config{
+		makemkvConfig: &makemkv.Config{
 			ExePath:          cmd.String(makemkvconFlagName),
 			ProfilePath:      profilePath,
 			ReadCacheSizeMB:  cmd.Int(cacheFlagName),
