@@ -10,8 +10,8 @@ import (
 	"sync"
 	"unicode"
 
-	"github.com/curt-hash/mkvbot/pkg/makemkvcon"
-	"github.com/curt-hash/mkvbot/pkg/makemkvcon/defs"
+	"github.com/curt-hash/mkvbot/pkg/makemkv"
+	"github.com/curt-hash/mkvbot/pkg/makemkv/defs"
 	"github.com/curt-hash/mkvbot/pkg/moviedb"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -183,7 +183,7 @@ func (t *textUserInterface) updateStatusBox() {
 	t.QueueUpdateDraw(t.statusBox.update)
 }
 
-func (t *textUserInterface) setDiscInfo(info makemkvcon.Info) {
+func (t *textUserInterface) setDiscInfo(info makemkv.Info) {
 	t.QueueUpdateDraw(func() {
 		w := t.discInfoBox.BatchWriter()
 		defer w.Close()
@@ -287,7 +287,7 @@ func (t *textUserInterface) setMovieMetadata(md *moviedb.Metadata) {
 	})
 }
 
-func (t *textUserInterface) getBestTitle(ctx context.Context, choices []*makemkvcon.Title) (*makemkvcon.Title, error) {
+func (t *textUserInterface) getBestTitle(ctx context.Context, choices []*makemkv.Title) (*makemkv.Title, error) {
 	continueChan := make(chan struct{})
 
 	var index int
@@ -370,7 +370,7 @@ func (t *textUserInterface) getBestTitle(ctx context.Context, choices []*makemkv
 	return choices[index], nil
 }
 
-func (t *textUserInterface) setTitleInfoFunc(title *makemkvcon.Title) func() {
+func (t *textUserInterface) setTitleInfoFunc(title *makemkv.Title) func() {
 	return func() {
 		w := t.titleInfoBox.BatchWriter()
 		defer w.Close()
@@ -382,7 +382,7 @@ func (t *textUserInterface) setTitleInfoFunc(title *makemkvcon.Title) func() {
 	}
 }
 
-func (t *textUserInterface) setTitleInfo(title *makemkvcon.Title) {
+func (t *textUserInterface) setTitleInfo(title *makemkv.Title) {
 	t.QueueUpdateDraw(t.setTitleInfoFunc(title))
 }
 
@@ -454,7 +454,7 @@ func (b *statusBox) update() {
 	}
 }
 
-func writeTitleInfo(w io.Writer, title *makemkvcon.Title) {
+func writeTitleInfo(w io.Writer, title *makemkv.Title) {
 	fmt.Fprintf(w, "Title %d\n\n", title.Index)
 
 	for _, attr := range title.Info {
@@ -473,16 +473,15 @@ func writeTitleInfo(w io.Writer, title *makemkvcon.Title) {
 	for _, stream := range title.Streams {
 		treeInfo := stream.GetAttrDefault(defs.TreeInfo, "-")
 
-		typ := stream.GetAttrDefault(defs.Type, "")
-		switch typ {
-		case "Video":
+		switch stream.Type() {
+		case defs.TypeCodeVideo:
 			size := stream.GetAttrDefault(defs.VideoSize, "unknown size")
 			bitrate := stream.GetAttrDefault(defs.Bitrate, "unknown bit rate")
 			if bitrate == "" {
 				bitrate = "unknown bit rate"
 			}
 			fmt.Fprintf(w, "\nVideo: %s (%s @ %s)\n", treeInfo, size, bitrate)
-		case "Audio":
+		case defs.TypeCodeAudio:
 			audioStreamCount++
 
 			codec := stream.GetAttrDefault(defs.CodecLong, "Unknown Codec")
@@ -490,7 +489,7 @@ func writeTitleInfo(w io.Writer, title *makemkvcon.Title) {
 			lang := stream.GetAttrDefault(defs.LangName, "Unknown")
 			key := fmt.Sprintf("%s %s", codec, layout)
 			audioLanguagesByType[key] = append(audioLanguagesByType[key], lang)
-		case "Subtitles":
+		case defs.TypeCodeSubtitles:
 			subtitlesStreamCount++
 
 			lang := stream.GetAttrDefault(defs.LangName, "Unknown")

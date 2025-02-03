@@ -1,6 +1,6 @@
 //go:build windows
 
-package makemkvcon
+package makemkv
 
 import (
 	"fmt"
@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 )
 
+// FindExe attempts to return the path of the makemkvcon executable on Windows
+// operating systems.
 func FindExe() (string, error) {
 	exe := "makemkvcon64.exe"
 	if path, err := exec.LookPath(exe); err == nil {

@@ -1,4 +1,4 @@
-package makemkvcon
+package makemkv
 
 import (
 	"encoding/csv"
@@ -7,31 +7,38 @@ import (
 	"strings"
 )
 
-// From https://makemkv.com/developers/usage.txt:
+// ProgressBarLine represents a "PRGV" output line, which describes the
+// progress of a task and sub-task.
 //
-// Progress bar values for current and total progress
-// PRGV:current,total,max
-// current - current progress value
-// total - total progress value
-// max - maximum possible value for a progress bar, constant
+// See https://makemkv.com/developers/usage.txt.
 type ProgressBarLine struct {
-	Current int `json:"current"`
-	Total   int `json:"total"`
-	Max     int `json:"max"`
+	// Current represents the progress of the current sub-task.
+	Current int
+
+	// Total represents the progress of the overall task.
+	Total int
+
+	// Max is a constant denominator used to calculate the progress percentage.
+	Max int
 }
 
 func (l *ProgressBarLine) Kind() LineKind {
 	return LineKindProgressBar
 }
 
+// CurrentProgress returns the progress of the current sub-task as a
+// percentage.
 func (l *ProgressBarLine) CurrentProgress() float64 {
 	return float64(l.Current) / float64(l.Max)
 }
 
+// TotalProgress returns the progress of the overall task as a percentage.
 func (l *ProgressBarLine) TotalProgress() float64 {
 	return float64(l.Total) / float64(l.Max)
 }
 
+// ParseProgressBarLine parses the string that follows "PRGV:" in the output of
+// makemkvcon.
 func ParseProgressBarLine(s string) (*ProgressBarLine, error) {
 	reader := csv.NewReader(strings.NewReader(s))
 	reader.FieldsPerRecord = 3

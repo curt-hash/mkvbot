@@ -1,16 +1,16 @@
-package makemkvcon
+package makemkv
 
 import (
 	"fmt"
 	"strconv"
 )
 
-// From https://makemkv.com/developers/usage.txt:
+// TitleCountLine represents a "TCOUNT" makemkvcon output line, which describes
+// the number of titles found on a disc.
 //
-// TCOUT:count
-// count - titles count
+// See https://makemkv.com/developers/usage.txt.
 type TitleCountLine struct {
-	Count int `json:"count"`
+	Count int
 }
 
 var _ Line = (*TitleCountLine)(nil)
@@ -19,6 +19,8 @@ func (l *TitleCountLine) Kind() LineKind {
 	return LineKindTitleCount
 }
 
+// ParseTitleCountLine parses the string that follows "TCOUNT:" in the output
+// of makemkvcon.
 func ParseTitleCountLine(s string) (*TitleCountLine, error) {
 	count, err := strconv.Atoi(s)
 	if err != nil {
