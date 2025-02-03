@@ -95,7 +95,7 @@ func New(cfg *Config) (*Con, error) {
 // ListDrives returns the list of drives detected by makemkvcon.
 func (c *Con) ListDrives(ctx context.Context) (*LineIterator[[]*DriveScanLine], error) {
 	// disc:9999 should trigger early termination since it is unlikely to exist.
-	seq, err := c.RunCmd(ctx, "info", "disc:9999")
+	seq, err := c.RunDefaultCmd(ctx, "info", "disc:9999")
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (c *Con) ListDrives(ctx context.Context) (*LineIterator[[]*DriveScanLine], 
 // ScanDrive returns information about the disc in the given drive. The
 // driveIndex should be obtained from ListDrives.
 func (c *Con) ScanDrive(ctx context.Context, driveIndex int) (*LineIterator[*Disc], error) {
-	seq, err := c.RunCmd(ctx, "info", fmt.Sprintf("disc:%d", driveIndex))
+	seq, err := c.RunDefaultCmd(ctx, "info", fmt.Sprintf("disc:%d", driveIndex))
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +169,7 @@ func (c *Con) BackupTitle(ctx context.Context, driveIndex, titleIndex int, dstDi
 		return nil, fmt.Errorf("make directory %q: %w", dstDir, err)
 	}
 
-	return c.RunCmd(
+	return c.RunDefaultCmd(
 		ctx,
 		"mkv",
 		"--decrypt",
@@ -182,10 +182,17 @@ func (c *Con) BackupTitle(ctx context.Context, driveIndex, titleIndex int, dstDi
 	)
 }
 
+// RunDefaultCmd calls RunCmd with default args in addition to the specified
+// args. Default args include -r (machine-readable output), --minlength, and
+// --profile.
+func (c *Con) RunDefaultCmd(ctx context.Context, args ...string) (iter.Seq2[Line, error], error) {
+	return c.RunCmd(ctx, slices.Concat(c.defaultArgs, args)...)
+}
+
 // RunCmd runs an arbitrary makemkvcon command with the given args. It
 // terminates when the context is canceled or the command terminates.
 func (c *Con) RunCmd(ctx context.Context, args ...string) (iter.Seq2[Line, error], error) {
-	cmd := exec.CommandContext(ctx, c.cfg.ExePath, slices.Concat(c.defaultArgs, args)...)
+	cmd := exec.CommandContext(ctx, c.cfg.ExePath, args...)
 	cmd.WaitDelay = time.Second
 
 	stdout, err := cmd.StdoutPipe()

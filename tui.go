@@ -193,7 +193,9 @@ func (t *textUserInterface) setDiscInfo(info makemkv.Info) {
 			fmt.Fprintln(w, item)
 		}
 
-		t.leftFlex.ResizeItem(t.discInfoBox, len(info)+2, 0)
+		if n := len(info); n > 0 {
+			t.leftFlex.ResizeItem(t.discInfoBox, n+2, 0)
+		}
 	})
 }
 
