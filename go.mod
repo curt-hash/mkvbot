@@ -10,7 +10,7 @@ require (
 	github.com/rivo/tview v0.0.0-20241227133733-17b7edb88c57
 	github.com/urfave/cli/v3 v3.0.0-beta1
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8
-	golang.org/x/sync v0.10.0
+	golang.org/x/sync v0.11.0
 )
 
 require (
