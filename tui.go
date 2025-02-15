@@ -189,8 +189,12 @@ func (t *textUserInterface) setDiscInfo(info makemkv.Info) {
 		defer w.Close()
 
 		w.Clear()
-		for _, item := range info {
-			fmt.Fprintln(w, item)
+		for _, attr := range info {
+			if defs.Attr(attr.ID) == defs.PanelTitle {
+				continue
+			}
+
+			fmt.Fprintln(w, attr)
 		}
 
 		if n := len(info); n > 0 {

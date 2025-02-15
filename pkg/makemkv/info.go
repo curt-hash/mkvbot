@@ -8,6 +8,10 @@ import (
 	"github.com/curt-hash/mkvbot/pkg/makemkv/defs"
 )
 
+func (a *Attribute) String() string {
+	return fmt.Sprintf("%s: %s", defs.Attr(a.ID).String(), a.Value)
+}
+
 // Info is a slice of related Attributes.
 type Info []*Attribute
 
