@@ -111,7 +111,7 @@ func (app *application) doBackupLoop(ctx context.Context) error {
 		return err
 	}
 
-	app.tui.setDriveInfo(drive.DriveName, drive.VolumeName)
+	app.tui.setDriveInfo(drive.DriveName.String(), drive.VolumeName.String())
 
 	for ctx.Err() == nil {
 		if err := app.tryBackupBestTitle(ctx, drive); err != nil {
@@ -128,7 +128,7 @@ func (app *application) doBackupLoop(ctx context.Context) error {
 	return nil
 }
 
-func (app *application) getDrive(ctx context.Context) (*makemkv.DriveScanLine, error) {
+func (app *application) getDrive(ctx context.Context) (*makemkv.DriveScan, error) {
 	iter, err := app.con.ListDrives(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("list drives: %w", err)
@@ -140,9 +140,9 @@ func (app *application) getDrive(ctx context.Context) (*makemkv.DriveScanLine, e
 			continue
 		}
 
-		switch v := line.(type) {
-		case *makemkv.MessageLine:
-			slog.Info(v.Message, "source", "makemkv")
+		switch {
+		case line.Message != nil:
+			slog.Info(line.Message.Message.String(), "source", "makemkv")
 		}
 	}
 
@@ -162,7 +162,7 @@ func (app *application) getDrive(ctx context.Context) (*makemkv.DriveScanLine, e
 	return drives[0], nil
 }
 
-func (app *application) tryBackupBestTitle(ctx context.Context, drive *makemkv.DriveScanLine) error {
+func (app *application) tryBackupBestTitle(ctx context.Context, drive *makemkv.DriveScan) error {
 	defer func() {
 		app.tui.setDiscInfo(nil)
 		app.tui.setMovieMetadata(nil)
@@ -181,15 +181,15 @@ func (app *application) tryBackupBestTitle(ctx context.Context, drive *makemkv.D
 			continue
 		}
 
-		switch v := line.(type) {
-		case *makemkv.TotalProgressLine:
-			app.tui.setTask("%s", v.Name)
-		case *makemkv.CurrentProgressLine:
-			app.tui.setSubtask("%s", v.Name)
-		case *makemkv.ProgressBarLine:
-			app.tui.setProgress(v.TotalProgress())
-		case *makemkv.MessageLine:
-			slog.Debug(v.Message, "source", "makemkv")
+		switch {
+		case line.CurrentTask != nil:
+			app.tui.setTask("%s", line.CurrentTask.Task.Name)
+		case line.CurrentSubtask != nil:
+			app.tui.setSubtask("%s", line.CurrentSubtask.Task.Name)
+		case line.Progress != nil:
+			app.tui.setProgress(line.Progress.TaskProgress())
+		case line.Message != nil:
+			slog.Debug(line.Message.Message.String(), "source", "makemkv")
 		}
 	}
 
@@ -241,7 +241,7 @@ func (app *application) tryBackupBestTitle(ctx context.Context, drive *makemkv.D
 	}
 
 	app.tui.setStatus("Ejecting disc")
-	if err := eject.Eject(ctx, drive.VolumeName); err != nil {
+	if err := eject.Eject(ctx, drive.VolumeName.String()); err != nil {
 		return fmt.Errorf("eject disc: %w", err)
 	}
 
@@ -270,7 +270,7 @@ func (app *application) getMovieMetadata(ctx context.Context, disc *makemkv.Disc
 	return app.tui.getMovieMetadata(ctx, metadata)
 }
 
-func (app *application) backupTitle(ctx context.Context, drive *makemkv.DriveScanLine, title *makemkv.Title, fileName string) error {
+func (app *application) backupTitle(ctx context.Context, drive *makemkv.DriveScan, title *makemkv.Title, fileName string) error {
 	dstDir := filepath.Join(app.cfg.outputDirPath, fileName)
 	dstPath := filepath.Join(dstDir, fmt.Sprintf("%s.mkv", fileName))
 	if _, err := os.Stat(dstPath); err == nil {
@@ -289,15 +289,15 @@ func (app *application) backupTitle(ctx context.Context, drive *makemkv.DriveSca
 			continue
 		}
 
-		switch v := line.(type) {
-		case *makemkv.TotalProgressLine:
-			app.tui.setTask("%s", v.Name)
-		case *makemkv.CurrentProgressLine:
-			app.tui.setSubtask("%s", v.Name)
-		case *makemkv.ProgressBarLine:
-			app.tui.setProgress(v.TotalProgress())
-		case *makemkv.MessageLine:
-			slog.Info(v.Message, "source", "makemkv")
+		switch {
+		case line.CurrentTask != nil:
+			app.tui.setTask("%s", line.CurrentTask.Task.Name)
+		case line.CurrentSubtask != nil:
+			app.tui.setSubtask("%s", line.CurrentSubtask.Task.Name)
+		case line.Progress != nil:
+			app.tui.setProgress(line.Progress.TaskProgress())
+		case line.Message != nil:
+			slog.Info(line.Message.Message.String(), "source", "makemkv")
 		}
 	}
 
