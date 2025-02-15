@@ -48,6 +48,7 @@ tasks:
     desc: "Run linters"
     cmds:
       - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+      - golangci-lint config verify
       - golangci-lint run
 
   test:

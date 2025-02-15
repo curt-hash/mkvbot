@@ -1,10 +1,8 @@
 package makemkv
 
 import (
-	"bufio"
 	"context"
 	"fmt"
-	"io"
 	"iter"
 	"log/slog"
 	"os"
@@ -93,15 +91,15 @@ func New(cfg *Config) (*Con, error) {
 }
 
 // ListDrives returns the list of drives detected by makemkvcon.
-func (c *Con) ListDrives(ctx context.Context) (*LineIterator[[]*DriveScanLine], error) {
+func (c *Con) ListDrives(ctx context.Context) (*LineIterator[[]*DriveScan], error) {
 	// disc:9999 should trigger early termination since it is unlikely to exist.
 	seq, err := c.RunDefaultCmd(ctx, "info", "disc:9999")
 	if err != nil {
 		return nil, err
 	}
 
-	iter := &LineIterator[[]*DriveScanLine]{}
-	iter.Seq = func(yield func(Line, error) bool) {
+	iter := &LineIterator[[]*DriveScan]{}
+	iter.Seq = func(yield func(*Line, error) bool) {
 		for line, err := range seq {
 			if !yield(line, err) {
 				return
@@ -111,10 +109,9 @@ func (c *Con) ListDrives(ctx context.Context) (*LineIterator[[]*DriveScanLine], 
 				continue
 			}
 
-			if line.Kind() == LineKindDriveScan {
-				l := line.(*DriveScanLine)
-				if l.DriveName != "" {
-					iter.result = append(iter.result, l)
+			if ds := line.DriveScan; ds != nil {
+				if ds.DriveName != "" {
+					iter.result = append(iter.result, ds)
 				}
 			}
 		}
@@ -136,7 +133,7 @@ func (c *Con) ScanDrive(ctx context.Context, driveIndex int) (*LineIterator[*Dis
 		result: d,
 	}
 
-	iter.Seq = func(yield func(Line, error) bool) {
+	iter.Seq = func(yield func(*Line, error) bool) {
 		for line, err := range seq {
 			if !yield(line, err) {
 				return
@@ -146,15 +143,17 @@ func (c *Con) ScanDrive(ctx context.Context, driveIndex int) (*LineIterator[*Dis
 				continue
 			}
 
-			switch l := line.(type) {
-			case *DiscInfoLine:
-				d.Info = append(d.Info, l.InfoLine)
-			case *TitleInfoLine:
-				t := d.GetTitle(l.TitleIndex)
-				t.Info = append(t.Info, l.InfoLine)
-			case *StreamInfoLine:
-				s := d.GetTitle(l.TitleIndex).GetStream(l.StreamIndex)
-				s.Info = append(s.Info, l.InfoLine)
+			switch {
+			case line.DiscInfo != nil:
+				d.Info = append(d.Info, line.DiscInfo.Attribute)
+			case line.TitleInfo != nil:
+				ti := line.TitleInfo
+				t := d.GetTitle(ti.TitleIndex)
+				t.Info = append(t.Info, ti.Attribute)
+			case line.StreamInfo != nil:
+				si := line.StreamInfo
+				s := d.GetTitle(si.TitleIndex).GetStream(si.StreamIndex)
+				s.Info = append(s.Info, si.Attribute)
 			}
 		}
 	}
@@ -164,7 +163,7 @@ func (c *Con) ScanDrive(ctx context.Context, driveIndex int) (*LineIterator[*Dis
 
 // BackupTitle creates a backup of title titleIndex of drive driveIndex in
 // dstDir. The directory is created automatically if necessary.
-func (c *Con) BackupTitle(ctx context.Context, driveIndex, titleIndex int, dstDir string) (iter.Seq2[Line, error], error) {
+func (c *Con) BackupTitle(ctx context.Context, driveIndex, titleIndex int, dstDir string) (iter.Seq2[*Line, error], error) {
 	if err := os.MkdirAll(dstDir, 0775); err != nil {
 		return nil, fmt.Errorf("make directory %q: %w", dstDir, err)
 	}
@@ -185,13 +184,13 @@ func (c *Con) BackupTitle(ctx context.Context, driveIndex, titleIndex int, dstDi
 // RunDefaultCmd calls RunCmd with default args in addition to the specified
 // args. Default args include -r (machine-readable output), --minlength, and
 // --profile.
-func (c *Con) RunDefaultCmd(ctx context.Context, args ...string) (iter.Seq2[Line, error], error) {
+func (c *Con) RunDefaultCmd(ctx context.Context, args ...string) (iter.Seq2[*Line, error], error) {
 	return c.RunCmd(ctx, slices.Concat(c.defaultArgs, args)...)
 }
 
 // RunCmd runs an arbitrary makemkvcon command with the given args. It
 // terminates when the context is canceled or the command terminates.
-func (c *Con) RunCmd(ctx context.Context, args ...string) (iter.Seq2[Line, error], error) {
+func (c *Con) RunCmd(ctx context.Context, args ...string) (iter.Seq2[*Line, error], error) {
 	cmd := exec.CommandContext(ctx, c.cfg.ExePath, args...)
 	cmd.WaitDelay = time.Second
 
@@ -205,7 +204,7 @@ func (c *Con) RunCmd(ctx context.Context, args ...string) (iter.Seq2[Line, error
 		return nil, err
 	}
 
-	return func(yield func(Line, error) bool) {
+	return func(yield func(*Line, error) bool) {
 		for line, err := range ParseLines(stdout) {
 			if !yield(line, err) {
 				return
@@ -216,41 +215,4 @@ func (c *Con) RunCmd(ctx context.Context, args ...string) (iter.Seq2[Line, error
 			yield(nil, err)
 		}
 	}, nil
-}
-
-// ParseLines parses makemkvcon output lines from r. It returns a sequence of
-// [Line, error] where either Line is a parsed line or err is non-nil. The
-// sequence ends after all lines have been parsed and r returns EOF. Individual
-// line parsing errors do not trigger an early return.
-func ParseLines(r io.Reader) iter.Seq2[Line, error] {
-	return func(yield func(Line, error) bool) {
-		scanner := bufio.NewScanner(r)
-		for scanner.Scan() {
-			s := scanner.Text()
-			line, err := ParseLine(s)
-			if err != nil {
-				err = fmt.Errorf("parse line %q: %w", s, err)
-			}
-			if !yield(line, err) {
-				return
-			}
-		}
-
-		if err := scanner.Err(); err != nil {
-			yield(nil, fmt.Errorf("scan lines from stdout: %w", err))
-		}
-	}
-}
-
-// LineIterator is a generic type that represents the lines output by a
-// makemkvcon command and the generic final result.
-type LineIterator[T any] struct {
-	Seq    iter.Seq2[Line, error]
-	result T
-	err    error
-}
-
-// GetResult returns the final result of the command.
-func (li *LineIterator[T]) GetResult() (T, error) {
-	return li.result, li.err
 }

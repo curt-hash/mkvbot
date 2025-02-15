@@ -1,0 +1,85 @@
+MSG:1005,0,1,"MakeMKV v1.16.4 linux(x64-release) started","%1 started","MakeMKV v1.16.4 linux(x64-release)"
+PRGT:5018,0,"Scanning CD-ROM devices"
+PRGC:5018,0,"Scanning CD-ROM devices"
+PRGV:0,0,65536
+PRGV:0,0,65536
+PRGV:65536,0,65536
+PRGV:65536,65536,65536
+DRV:0,0,999,0,"DVD-ROM PLDS DVD-ROM DS-8D3SH HD51","","/dev/sr0"
+DRV:1,256,999,0,"","",""
+DRV:2,256,999,0,"","",""
+DRV:3,256,999,0,"","",""
+DRV:4,256,999,0,"","",""
+DRV:5,256,999,0,"","",""
+DRV:6,256,999,0,"","",""
+DRV:7,256,999,0,"","",""
+DRV:8,256,999,0,"","",""
+DRV:9,256,999,0,"","",""
+DRV:10,256,999,0,"","",""
+DRV:11,256,999,0,"","",""
+DRV:12,256,999,0,"","",""
+DRV:13,256,999,0,"","",""
+DRV:14,256,999,0,"","",""
+DRV:15,256,999,0,"","",""
+PRGV:0,65536,65536
+PRGV:0,0,65536
+MSG:3006,131072,1,"Opening files on harddrive at file://BDMV/..","Opening files on harddrive at %1","file://BDMV/.."
+PRGT:3404,0,"Opening Blu-ray disc"
+PRGC:3400,0,"Processing AV clips"
+PRGV:0,0,65536
+PRGV:0,0,65536
+PRGC:3401,0,"Processing movie playlists"
+PRGC:3402,0,"Decrypting"
+MSG:3305,0,0,"AACS directory not present, assuming unencrypted disc","AACS directory not present, assuming unencrypted disc"
+PRGC:3406,0,"Processing BD+ code"
+PRGC:3403,0,"Processing titles"
+PRGV:3744,0,65536
+PRGV:3744,313,65536
+MSG:3307,0,2,"File 00001.mpls was added as title #0","File %1 was added as title #%2","00001.mpls","0"
+PRGV:9362,313,65536
+PRGV:9362,783,65536
+MSG:3307,0,2,"File 00803.mpls was added as title #1","File %1 was added as title #%2","00803.mpls","1"
+PRGV:13107,783,65536
+PRGV:13107,1097,65536
+MSG:3307,0,2,"File 00021.mpls was added as title #2","File %1 was added as title #%2","00021.mpls","2"
+PRGV:18724,1097,65536
+PRGV:18724,1567,65536
+MSG:3307,0,2,"File 00801.mpls was added as title #3","File %1 was added as title #%2","00801.mpls","3"
+PRGV:33704,1567,65536
+PRGV:33704,2822,65536
+MSG:3307,0,2,"File 00313.m2ts was added as title #4","File %1 was added as title #%2","00313.m2ts","4"
+PRGV:35576,2822,65536
+PRGV:35576,2978,65536
+MSG:3307,16777216,2,"File 00307.m2ts was added as title #5","File %1 was added as title #%2","00307.m2ts","5"
+MSG:3025,16777216,3,"Title #00230.m2ts has length of 0 seconds which is less than minimum title length of 120 seconds and was therefore skipped","Title #%1 has length of %2 seconds which is less than minimum title length of %3 seconds and was therefore skipped","00230.m2ts","0","120"
+MSG:3025,0,3,"Title #00231.m2ts has length of 20 seconds which is less than minimum title length of 120 seconds and was therefore skipped","Title #%1 has length of %2 seconds which is less than minimum title length of %3 seconds and was therefore skipped","00231.m2ts","20","120"
+PRGV:44938,2978,65536
+PRGV:44938,3762,65536
+MSG:3307,16777216,2,"File 00312.m2ts was added as title #6","File %1 was added as title #%2","00312.m2ts","6"
+MSG:3025,16777216,3,"Title #00304.m2ts has length of 62 seconds which is less than minimum title length of 120 seconds and was therefore skipped","Title #%1 has length of %2 seconds which is less than minimum title length of %3 seconds and was therefore skipped","00304.m2ts","62","120"
+MSG:3025,16777216,3,"Title #00295.m2ts has length of 62 seconds which is less than minimum title length of 120 seconds and was therefore skipped","Title #%1 has length of %2 seconds which is less than minimum title length of %3 seconds and was therefore skipped","00295.m2ts","62","120"
+MSG:3025,16777216,3,"Title #00314.m2ts has length of 62 seconds which is less than minimum title length of 120 seconds and was therefore skipped","Title #%1 has length of %2 seconds which is less than minimum title length of %3 seconds and was therefore skipped","00314.m2ts","62","120"
+MSG:3025,16777216,3,"Title #00310.m2ts has length of 69 seconds which is less than minimum title length of 120 seconds and was therefore skipped","Title #%1 has length of %2 seconds which is less than minimum title length of %3 seconds and was therefore skipped","00310.m2ts","69","120"
+MSG:3025,0,3,"Title #00315.m2ts has length of 62 seconds which is less than minimum title length of 120 seconds and was therefore skipped","Title #%1 has length of %2 seconds which is less than minimum title length of %3 seconds and was therefore skipped","00315.m2ts","62","120"
+PRGV:59918,3762,65536
+PRGV:59918,5017,65536
+MSG:3307,0,2,"File 00311.m2ts was added as title #7","File %1 was added as title #%2","00311.m2ts","7"
+PRGV:61791,5017,65536
+PRGV:61791,5173,65536
+MSG:3307,16777216,2,"File 00309.m2ts was added as title #8","File %1 was added as title #%2","00309.m2ts","8"
+MSG:3025,0,3,"Title #00305.m2ts has length of 81 seconds which is less than minimum title length of 120 seconds and was therefore skipped","Title #%1 has length of %2 seconds which is less than minimum title length of %3 seconds and was therefore skipped","00305.m2ts","81","120"
+PRGV:65536,5173,65536
+PRGV:65536,5487,65536
+MSG:5011,0,0,"Operation successfully completed","Operation successfully completed"
+PRGV:0,5487,65536
+PRGV:0,0,65536
+PRGT:5024,0,"Saving all titles to MKV files"
+MSG:5014,131072,2,"Saving 9 titles into directory file://.","Saving %1 titles into directory %2","9","file://."
+PRGC:5057,0,"Analyzing seamless segments"
+PRGV:0,0,65536
+PRGV:0,0,65536
+PRGV:49152,0,65536
+PRGC:5017,0,"Saving to MKV file"
+PRGV:0,0,65536
+PRGV:296,0,65536
+PRGV:296,108,65536
