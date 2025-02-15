@@ -1,10 +1,10 @@
 package makemkv
 
 import (
+	"cmp"
 	"time"
 
 	"github.com/curt-hash/mkvbot/pkg/makemkv/defs"
-	"golang.org/x/exp/constraints"
 )
 
 // Disc is a sequence of titles plus some metadata.
@@ -68,7 +68,7 @@ func (d *Disc) TitlesWithMostStreams() []*Title {
 
 // Maximums returns all elements of the slice that maximize the given function,
 // i.e., where f(e) = max(f(e0), f(e1), ..., f(eN)).
-func Maximums[S []E, E any, V constraints.Ordered](s S, f func(E) (V, error)) S {
+func Maximums[S []E, E any, V cmp.Ordered](s S, f func(E) (V, error)) S {
 	var (
 		maxV     V
 		maximums S
