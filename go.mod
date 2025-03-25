@@ -4,7 +4,7 @@ go 1.23.5
 
 require (
 	github.com/StalkR/imdb v1.0.16-0.20250113131526-e8846853d815
-	github.com/alecthomas/participle/v2 v2.1.1
+	github.com/alecthomas/participle/v2 v2.1.4
 	github.com/gdamore/tcell/v2 v2.8.1
 	github.com/gen2brain/beeep v0.0.0-20240516210008-9c006672e7f4
 	github.com/go-playground/validator/v10 v10.25.0
