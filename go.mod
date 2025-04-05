@@ -1,13 +1,13 @@
 module github.com/curt-hash/mkvbot
 
-go 1.23.5
+go 1.24.2
 
 require (
 	github.com/StalkR/imdb v1.0.16-0.20250113131526-e8846853d815
 	github.com/alecthomas/participle/v2 v2.1.4
 	github.com/gdamore/tcell/v2 v2.8.1
 	github.com/gen2brain/beeep v0.0.0-20240516210008-9c006672e7f4
-	github.com/go-playground/validator/v10 v10.25.0
+	github.com/go-playground/validator/v10 v10.26.0
 	github.com/rivo/tview v0.0.0-20241227133733-17b7edb88c57
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v3 v3.0.0-beta1
