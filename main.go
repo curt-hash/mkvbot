@@ -12,7 +12,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-//go:embed profile.xml
+//go:embed makemkv.xml
 var profileBytes []byte
 
 func main() {
@@ -24,17 +24,31 @@ func main() {
 }
 
 func run(ctx context.Context, cmd *cli.Command) error {
-	if cmd.Bool(createProfileFlagName) {
-		name := "profile.xml"
-		if _, err := os.Stat(name); err == nil {
-			return fmt.Errorf("create %q: file exists", name)
+	if cmd.Bool(createConfigFlagName) {
+		c := newDefaultConfig()
+		name := defaultConfigPath
+		if err := c.writeToFile(defaultConfigPath); err != nil {
+			return fmt.Errorf("create %q: %w", name, err)
 		}
+		fmt.Printf("wrote mkvbot config file %q\n", name)
+		return nil
+	}
+
+	if cmd.Bool(createProfileFlagName) {
+		name := defaultProfilePath
 		if err := os.WriteFile(name, profileBytes, 0600); err != nil {
 			return fmt.Errorf("create %q: %w", name, err)
 		}
+		fmt.Printf("wrote makemkv profile %q\n", name)
+		return nil
 	}
 
-	profilePath := cmd.String(profileFlagName)
+	cfg, err := newConfigFromFile(cmd.String(configFlagName))
+	if err != nil {
+		return fmt.Errorf("load config: %w", err)
+	}
+
+	profilePath := cfg.ProfilePath
 	if _, err := os.Stat(profilePath); err == nil {
 		if profilePath, err = filepath.Abs(profilePath); err != nil {
 			return fmt.Errorf("get absolute path of %q: %w", profilePath, err)
@@ -44,27 +58,22 @@ func run(ctx context.Context, cmd *cli.Command) error {
 		profilePath = ""
 	}
 
-	weights := make(map[string]int64, len(bestTitleHeuristics))
-	for _, h := range bestTitleHeuristics {
-		weights[h.name] = cmd.Int64(h.flagName)
-	}
-
-	cfg := &applicationConfig{
-		outputDirPath: cmd.String(outputDirFlagName),
+	appCfg := &applicationConfig{
+		outputDirPath: cfg.OutputDirPath,
 		makemkvConfig: &makemkv.Config{
-			ExePath:          cmd.String(makemkvconFlagName),
+			ExePath:          cfg.MakemkvconPath,
 			ProfilePath:      profilePath,
-			ReadCacheSizeMB:  cmd.Int64(cacheFlagName),
-			MinLengthSeconds: cmd.Int64(minLengthFlagName),
+			ReadCacheSizeMB:  int64(cfg.CacheSize),
+			MinLengthSeconds: int64(cfg.MinLength),
 		},
-		debug:                      cmd.Bool(debugFlagName),
-		quiet:                      cmd.Bool(quietFlagName),
-		bestTitleHeuristicsWeights: weights,
-		askForTitle:                cmd.Bool(askForTitleFlagName),
-		logFilePath:                cmd.String(logFileFlagName),
+		debug:                      cfg.Debug,
+		quiet:                      cfg.Quiet,
+		bestTitleHeuristicsWeights: cfg.BestTitleHeuristicWeights,
+		askForTitle:                cfg.AskForTitle,
+		logFilePath:                cfg.LogFilePath,
 	}
 
-	app, err := newApplication(cfg)
+	app, err := newApplication(appCfg)
 	if err != nil {
 		return fmt.Errorf("initialize application: %w", err)
 	}

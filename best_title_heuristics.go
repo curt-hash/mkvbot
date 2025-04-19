@@ -7,11 +7,9 @@ import (
 )
 
 type bestTitleHeuristic struct {
-	name      string
-	f         func(*makemkv.Disc) []*makemkv.Title
-	weight    int64
-	flagName  string
-	flagUsage string
+	name   string
+	f      func(*makemkv.Disc) []*makemkv.Title
+	weight int
 }
 
 var bestTitleHeuristics = []*bestTitleHeuristic{
@@ -20,41 +18,33 @@ var bestTitleHeuristics = []*bestTitleHeuristic{
 		f: func(d *makemkv.Disc) []*makemkv.Title {
 			return d.TitlesWithLongestDuration()
 		},
-		weight:    1000,
-		flagName:  "longest-title-weight",
-		flagUsage: "`WEIGHT` given to longest title(s)",
+		weight: 1000,
 	},
 	{
-		name: "most chapters",
+		name: "most_chapters",
 		f: func(d *makemkv.Disc) []*makemkv.Title {
 			return d.TitlesWithMostChapters()
 		},
-		weight:    200,
-		flagName:  "most-chapters-weight",
-		flagUsage: "`WEIGHT` given to title(s) with the most chapters",
+		weight: 200,
 	},
 	{
-		name: "angle one",
+		name: "angle_one",
 		f: func(d *makemkv.Disc) []*makemkv.Title {
 			return d.TitlesWithAngle(1)
 		},
-		weight:    300,
-		flagName:  "angle-one-weight",
-		flagUsage: "`WEIGHT` given to title(s) with angle one",
+		weight: 300,
 	},
 	{
-		name: "most streams",
+		name: "most_streams",
 		f: func(d *makemkv.Disc) []*makemkv.Title {
 			return d.TitlesWithMostStreams()
 		},
-		weight:    100,
-		flagName:  "most-streams-weight",
-		flagUsage: "`WEIGHT` given to title(s) with the most streams",
+		weight: 100,
 	},
 }
 
-func findBestTitle(disc *makemkv.Disc, weights map[string]int64) []*makemkv.Title {
-	scores := make([]int64, len(disc.Titles))
+func findBestTitle(disc *makemkv.Disc, weights map[string]int) []*makemkv.Title {
+	scores := make([]int, len(disc.Titles))
 	for _, h := range bestTitleHeuristics {
 		for _, title := range h.f(disc) {
 			scores[title.Index] += weights[h.name]
@@ -62,7 +52,7 @@ func findBestTitle(disc *makemkv.Disc, weights map[string]int64) []*makemkv.Titl
 	}
 	slog.Debug("scored titles", "scores", scores)
 
-	return makemkv.Maximums(disc.Titles, func(title *makemkv.Title) (int64, error) {
+	return makemkv.Maximums(disc.Titles, func(title *makemkv.Title) (int, error) {
 		return scores[title.Index], nil
 	})
 }

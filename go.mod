@@ -3,6 +3,7 @@ module github.com/curt-hash/mkvbot
 go 1.25.3
 
 require (
+	github.com/BurntSushi/toml v1.6.0
 	github.com/StalkR/imdb v1.0.17
 	github.com/alecthomas/participle/v2 v2.1.4
 	github.com/gdamore/tcell/v2 v2.13.4
