@@ -89,7 +89,7 @@ func newCLICommand() *cli.Command {
 	}
 
 	for _, h := range bestTitleHeuristics {
-		cmd.Flags = append(cmd.Flags, &cli.IntFlag{
+		cmd.Flags = append(cmd.Flags, &cli.Int64Flag{
 			Name:        h.flagName,
 			Value:       h.weight,
 			Usage:       h.flagUsage,
