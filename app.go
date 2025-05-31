@@ -25,7 +25,7 @@ type (
 		makemkvConfig              *makemkv.Config
 		debug                      bool
 		quiet                      bool
-		bestTitleHeuristicsWeights map[string]int64
+		bestTitleHeuristicsWeights map[string]int
 		askForTitle                bool
 		logFilePath                string
 	}

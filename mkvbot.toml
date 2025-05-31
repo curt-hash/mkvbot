@@ -1,0 +1,15 @@
+debug = false
+makemkvcon_path = ""
+makemkv_profile_path = "makemkv.xml"
+cache_size = 1024
+min_length = 1800
+output_dir_path = "."
+quiet = false
+ask_for_title = false
+log_file_path = ""
+
+[best_title_heuristic_weights]
+  angle_one = 300
+  longest = 1000
+  most_chapters = 200
+  most_streams = 100

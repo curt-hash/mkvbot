@@ -1,3 +1,5 @@
+github.com/BurntSushi/toml v1.5.0 h1:W5quZX/G/csjUnuI8SUYlsHs9M38FC7znL0lIO+DvMg=
+github.com/BurntSushi/toml v1.5.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=
 github.com/StalkR/httpcache v1.0.0 h1:Px+QK86m7FEEvCfpfC+C0sNiUnRrLQyMVVJ6LKiXNvk=
 github.com/StalkR/httpcache v1.0.0/go.mod h1:yvbaYwH6w1USHPqgspMSwumbLwWE+B7jIZgfLYkTw1M=
 github.com/StalkR/imdb v1.0.16-0.20250113131526-e8846853d815 h1:Gu7OmXKb134DaFmAQMSjXZYBE1C5Nu8Z6ncWnWp4qBs=
