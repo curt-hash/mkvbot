@@ -46,7 +46,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 
 	weights := make(map[string]int64, len(bestTitleHeuristics))
 	for _, h := range bestTitleHeuristics {
-		weights[h.name] = cmd.Int(h.flagName)
+		weights[h.name] = cmd.Int64(h.flagName)
 	}
 
 	cfg := &applicationConfig{
@@ -54,8 +54,8 @@ func run(ctx context.Context, cmd *cli.Command) error {
 		makemkvConfig: &makemkv.Config{
 			ExePath:          cmd.String(makemkvconFlagName),
 			ProfilePath:      profilePath,
-			ReadCacheSizeMB:  cmd.Int(cacheFlagName),
-			MinLengthSeconds: cmd.Int(minLengthFlagName),
+			ReadCacheSizeMB:  cmd.Int64(cacheFlagName),
+			MinLengthSeconds: cmd.Int64(minLengthFlagName),
 		},
 		debug:                      cmd.Bool(debugFlagName),
 		quiet:                      cmd.Bool(quietFlagName),
