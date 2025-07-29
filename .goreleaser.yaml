@@ -63,7 +63,7 @@ nfpms:
         file_info:
           mode: 0644
 
-brews:
+homebrew_casks:
   - name: mkvbot
     repository:
       owner: curt-hash
@@ -71,9 +71,15 @@ brews:
     commit_author:
       name: Curt Hash
       email: curt.hash@gmail.com
-    directory: Formula
+    directory: Casks
+    conflicts:
+      - formula: mkvbot
+    hooks:
+      post:
+        install: |
+          if system_command("/usr/bin/xattr", args: ["-h"]).exit_status == 0
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/mkvbot"]
+          end
     homepage: https://github.com/curt-hash/mkvbot
     description: Automation for makemkv
     license: MIT
-    test: |
-      system "#{bin}/mkvbot", "-v"
