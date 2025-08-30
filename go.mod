@@ -5,7 +5,7 @@ go 1.24.2
 require (
 	github.com/StalkR/imdb v1.0.16-0.20250113131526-e8846853d815
 	github.com/alecthomas/participle/v2 v2.1.4
-	github.com/gdamore/tcell/v2 v2.8.1
+	github.com/gdamore/tcell/v2 v2.9.0
 	github.com/gen2brain/beeep v0.11.1
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/rivo/tview v0.0.0-20241227133733-17b7edb88c57
@@ -36,8 +36,8 @@ require (
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	golang.org/x/crypto v0.36.0 // indirect
 	golang.org/x/net v0.38.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/term v0.30.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/term v0.34.0 // indirect
+	golang.org/x/text v0.28.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
