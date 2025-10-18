@@ -25,6 +25,7 @@ jobs:
       - name: Lint
         uses: golangci/golangci-lint-action@v8
         with:
+          version: 2.5.0
           install-mode: goinstall
 
   test:
@@ -89,4 +90,4 @@ jobs:
       - name: Generate
         run: task generate
       - name: Check Diff
-        run: test -z "$(git status --porcelain)"
+        run: git status --porcelain && test -z "$(git status --porcelain)"
