@@ -72,8 +72,6 @@ homebrew_casks:
       name: Curt Hash
       email: curt.hash@gmail.com
     directory: Casks
-    conflicts:
-      - formula: mkvbot
     hooks:
       post:
         install: |

@@ -66,8 +66,9 @@ const _Attr_name = "UnknownTypeNameLangCodeLangNameCodecIDCodecShortCodecLongCha
 var _Attr_index = [...]uint16{0, 7, 11, 15, 23, 31, 38, 48, 57, 69, 77, 85, 98, 117, 124, 142, 151, 165, 180, 195, 204, 220, 234, 245, 253, 268, 281, 292, 306, 326, 346, 354, 364, 374, 385, 397, 420, 432, 441, 449, 461, 483, 499, 519, 540, 561, 585, 613, 637, 662, 669, 685}
 
 func (i Attr) String() string {
-	if i < 0 || i >= Attr(len(_Attr_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_Attr_index)-1 {
 		return "Attr(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _Attr_name[_Attr_index[i]:_Attr_index[i+1]]
+	return _Attr_name[_Attr_index[idx]:_Attr_index[idx+1]]
 }

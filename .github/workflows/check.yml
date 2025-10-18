@@ -23,7 +23,10 @@ jobs:
         with:
           go-version-file: go.mod
       - name: Lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.5.0
+          install-mode: goinstall
 
   test:
     name: Test
@@ -81,10 +84,10 @@ jobs:
           version: 3.x
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install stringer
-        run: go install golang.org/x/tools/cmd/stringer@latest
+        run: go install golang.org/x/tools/cmd/stringer@v0.38.0
       - name: Tidy
         run: task tidy
       - name: Generate
         run: task generate
       - name: Check Diff
-        run: test -z "$(git status --porcelain)"
+        run: git status --porcelain && test -z "$(git status --porcelain)"
