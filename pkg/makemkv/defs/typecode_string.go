@@ -19,9 +19,9 @@ const _TypeCode_name = "TitleVideoAudioSubtitles"
 var _TypeCode_index = [...]uint8{0, 5, 10, 15, 24}
 
 func (i TypeCode) String() string {
-	i -= 6200
-	if i < 0 || i >= TypeCode(len(_TypeCode_index)-1) {
-		return "TypeCode(" + strconv.FormatInt(int64(i+6200), 10) + ")"
+	idx := int(i) - 6200
+	if i < 6200 || idx >= len(_TypeCode_index)-1 {
+		return "TypeCode(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _TypeCode_name[_TypeCode_index[i]:_TypeCode_index[i+1]]
+	return _TypeCode_name[_TypeCode_index[idx]:_TypeCode_index[idx+1]]
 }
