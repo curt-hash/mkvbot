@@ -5,7 +5,7 @@ go 1.25.3
 require (
 	github.com/StalkR/imdb v1.0.17
 	github.com/alecthomas/participle/v2 v2.1.4
-	github.com/gdamore/tcell/v2 v2.13.8
+	github.com/gdamore/tcell/v2 v2.13.9
 	github.com/gen2brain/beeep v0.11.2
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/rivo/tview v0.42.0
