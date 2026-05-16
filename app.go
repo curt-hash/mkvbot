@@ -319,7 +319,22 @@ func (app *application) backupTitle(ctx context.Context, drive *makemkv.DriveSca
 }
 
 func makeFileName(metadata *moviedb.MovieMetadata) string {
-	return fmt.Sprintf("%s (%d) {%s}", sanitizeFileName(metadata.Name), metadata.Year, sanitizeFileName(metadata.ID))
+	name := sanitizeFileName(metadata.Name)
+	if name == "" {
+		name = fmt.Sprintf("Unknown Title %s", sanitizeFileName(time.Now().UTC().Format(time.RFC3339)))
+	}
+
+	year := metadata.Year
+	if year == 0 {
+		year = time.Now().Year()
+	}
+
+	tag := sanitizeFileName(metadata.ID)
+	if tag == "" {
+		return fmt.Sprintf("%s (%d)", name, year)
+	}
+
+	return fmt.Sprintf("%s (%d) {%s}", name, year, tag)
 }
 
 func searchMovieDB(q string) (*moviedb.MovieMetadata, error) {

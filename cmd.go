@@ -48,7 +48,7 @@ func newCLICommand() *cli.Command {
 		Name:      "mkvbot",
 		Version:   Version,
 		Usage:     "Automation for makemkv",
-		Copyright: "(c) 2026 Curt Hash",
+		Copyright: "(c) 2025–2026 Curt Hash",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        configFlagName,
@@ -87,7 +87,7 @@ func newCLICommand() *cli.Command {
 			&cli.Int64Flag{
 				Name:    cacheFlagName,
 				Value:   1024,
-				Usage:   "pass --cache=`SIZE` to makemkv",
+				Usage:   "pass --cache=`SIZE`MiB to makemkv",
 				Aliases: []string{"c"},
 				Sources: tomlSource("cache_size"),
 			},
