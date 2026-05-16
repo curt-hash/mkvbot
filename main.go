@@ -12,8 +12,11 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-//go:embed profile.xml
+//go:embed makemkv.xml
 var profileBytes []byte
+
+//go:embed mkvbot.toml
+var configBytes []byte
 
 func main() {
 	cmd := newCLICommand()
@@ -24,14 +27,20 @@ func main() {
 }
 
 func run(ctx context.Context, cmd *cli.Command) error {
+	if cmd.Bool(createConfigFlagName) {
+		if err := os.WriteFile(defaultConfigPath, configBytes, 0600); err != nil {
+			return fmt.Errorf("create %q: %w", defaultConfigPath, err)
+		}
+		fmt.Printf("wrote mkvbot config file %q\n", defaultConfigPath)
+		return nil
+	}
+
 	if cmd.Bool(createProfileFlagName) {
-		name := "profile.xml"
-		if _, err := os.Stat(name); err == nil {
-			return fmt.Errorf("create %q: file exists", name)
+		if err := os.WriteFile(defaultProfilePath, profileBytes, 0600); err != nil {
+			return fmt.Errorf("create %q: %w", defaultProfilePath, err)
 		}
-		if err := os.WriteFile(name, profileBytes, 0600); err != nil {
-			return fmt.Errorf("create %q: %w", name, err)
-		}
+		fmt.Printf("wrote makemkv profile %q\n", defaultProfilePath)
+		return nil
 	}
 
 	profilePath := cmd.String(profileFlagName)

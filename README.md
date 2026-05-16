@@ -56,7 +56,32 @@ Since it does not always pick the correct title or movie metadata, it currently
 prompts for confirmation. It will also prompt you to choose the best title if
 there is a tie. That may change as it gets smarter.
 
-Audio track and subtitles selection is based on the value of
-`app_DefaultSelectionString` in [profile.xml](profile.xml). For whatever reason,
+### Configuration file
+
+For settings you'd rather not retype every run (output directory, cache size,
+heuristic weights, etc.), `mkvbot` reads a TOML config file. Generate a
+commented default with:
+
+```sh
+mkvbot --create-config
+```
+
+That writes `mkvbot.toml` in the current directory. Pass `--config PATH` to use
+a different location. Every CLI flag has a corresponding key in the file;
+command-line flags always win over config-file values, which win over the
+built-in defaults.
+
+### MakeMKV profile
+
+Audio track and subtitle selection is based on the value of
+`app_DefaultSelectionString` in [makemkv.xml](makemkv.xml). For whatever reason,
 `makemkvcon` (the CLI application) does not seem to honor the selection string
-set in the GUI application preferences.
+set in the GUI application preferences. Generate a default profile with:
+
+```sh
+mkvbot --create-profile
+```
+
+(Note: prior versions called this file `profile.xml`. If you have an existing
+`profile.xml`, either rename it to `makemkv.xml` or set
+`makemkv_profile_path = "profile.xml"` in your config file.)
