@@ -25,7 +25,7 @@ var bestTitleHeuristics = []*bestTitleHeuristic{
 		flagUsage: "`WEIGHT` given to longest title(s)",
 	},
 	{
-		name: "most chapters",
+		name: "most_chapters",
 		f: func(d *makemkv.Disc) []*makemkv.Title {
 			return d.TitlesWithMostChapters()
 		},
@@ -34,7 +34,7 @@ var bestTitleHeuristics = []*bestTitleHeuristic{
 		flagUsage: "`WEIGHT` given to title(s) with the most chapters",
 	},
 	{
-		name: "angle one",
+		name: "angle_one",
 		f: func(d *makemkv.Disc) []*makemkv.Title {
 			return d.TitlesWithAngle(1)
 		},
@@ -43,7 +43,7 @@ var bestTitleHeuristics = []*bestTitleHeuristic{
 		flagUsage: "`WEIGHT` given to title(s) with angle one",
 	},
 	{
-		name: "most streams",
+		name: "most_streams",
 		f: func(d *makemkv.Disc) []*makemkv.Title {
 			return d.TitlesWithMostStreams()
 		},

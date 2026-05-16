@@ -10,12 +10,14 @@ require (
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/rivo/tview v0.42.0
 	github.com/stretchr/testify v1.11.1
+	github.com/urfave/cli-altsrc/v3 v3.1.0
 	github.com/urfave/cli/v3 v3.8.0
 	golang.org/x/sync v0.20.0
 )
 
 require (
 	git.sr.ht/~jackmordaunt/go-toast v1.1.2 // indirect
+	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/esiqveland/notify v0.13.3 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect

@@ -1,0 +1,39 @@
+# mkvbot configuration file.
+#
+# Any value set here can be overridden on the command line with the
+# corresponding flag (run `mkvbot --help` for the flag names). Values left
+# unset fall back to the built-in defaults shown below.
+
+# log debug messages
+debug = false
+
+# path to the makemkvcon executable (empty means look on PATH / known locations)
+makemkvcon_path = ""
+
+# path to the makemkv profile xml passed via --profile=
+makemkv_profile_path = "makemkv.xml"
+
+# size in MB passed to makemkv via --cache=
+cache_size = 1024
+
+# minimum title length in seconds passed to makemkv via --minlength=
+min_length = 1800
+
+# directory to write output files into
+output_dir_path = "."
+
+# disable the audible beep on completion
+quiet = false
+
+# always prompt for which title to back up rather than auto-selecting
+ask_for_title = false
+
+# append log messages to this file (empty = no log file)
+log_file_path = ""
+
+# weights for the heuristics used to pick the "best" title to back up
+[best_title_heuristic_weights]
+  longest = 1000
+  most_chapters = 200
+  angle_one = 300
+  most_streams = 100
