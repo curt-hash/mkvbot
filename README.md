@@ -66,6 +66,16 @@ mkvbot --debug            # verbose logging
 
 Insert a disc and run `mkvbot`. The TUI shows drive/disc/movie/title info, a log, and input forms when decisions are needed. `Ctrl+C` exits cleanly.
 
+## Beta Key
+
+MakeMKV's beta key expires every few months. To fetch the current key from the [MakeMKV forum](https://forum.makemkv.com/forum/viewtopic.php?t=1053) and register it automatically:
+
+```sh
+mkvbot update-key
+```
+
+On Windows this writes to the registry; on Linux/macOS it updates `~/.MakeMKV/settings.conf`.
+
 ## Rip Filenames
 
 Follows [Plex's naming convention](https://support.plex.tv/articles/naming-and-organizing-your-movie-media-files):
