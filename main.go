@@ -27,6 +27,10 @@ func main() {
 }
 
 func run(ctx context.Context, cmd *cli.Command) error {
+	if cmd.Bool(demoFlagName) {
+		return runDemo(ctx)
+	}
+
 	if cmd.Bool(createConfigFlagName) {
 		if err := os.WriteFile(defaultConfigPath, configBytes, 0600); err != nil {
 			return fmt.Errorf("create %q: %w", defaultConfigPath, err)
