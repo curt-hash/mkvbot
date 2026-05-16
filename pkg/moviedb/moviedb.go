@@ -1,3 +1,9 @@
+// Package moviedb defines the [MovieDB] interface for movie metadata lookups
+// and the [MovieMetadata] type used to represent results.
+//
+// The only current implementation is an IMDb scraper ([NewIMDb]), which
+// searches IMDb and returns metadata in the format required by Plex's file
+// naming convention.
 package moviedb
 
 // MovieMetadata is metadata about a movie.

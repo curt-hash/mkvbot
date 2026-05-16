@@ -13,7 +13,7 @@ makemkvcon_path = ""
 # path to the makemkv profile xml passed via --profile=
 makemkv_profile_path = "makemkv.xml"
 
-# size in MB passed to makemkv via --cache=
+# size in MiB passed to makemkv via --cache=
 cache_size = 1024
 
 # minimum title length in seconds passed to makemkv via --minlength=

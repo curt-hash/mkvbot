@@ -59,7 +59,7 @@ nfpms:
     section: utils
     contents:
       - src: ./LICENSE
-        dst: /usr/share/doc/makemkv/copyright
+        dst: /usr/share/doc/mkvbot/copyright
         file_info:
           mode: 0644
 
