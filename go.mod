@@ -1,6 +1,6 @@
 module github.com/curt-hash/mkvbot
 
-go 1.25.3
+go 1.26.3
 
 require (
 	github.com/StalkR/imdb v1.0.17
