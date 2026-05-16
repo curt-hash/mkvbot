@@ -4,7 +4,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/curt-hash/mkvbot.svg)](https://pkg.go.dev/github.com/curt-hash/mkvbot)
 [![Release](https://img.shields.io/github/v/release/curt-hash/mkvbot)](https://github.com/curt-hash/mkvbot/releases)
 
-A simple CLI for ripping Blu-rays and DVDs with MakeMKV. Insert a disc, it picks the best title, looks it up on IMDb, and rips it to a folder named for Plex.
+A simple TUI for ripping Blu-rays and DVDs with MakeMKV. Insert a disc, it picks the best title, looks it up on IMDb, and rips it to a folder named for Plex.
 
 ## What it does
 
@@ -65,6 +65,8 @@ mkvbot --debug            # verbose logging
 ```
 
 Insert a disc and run `mkvbot`. The TUI shows drive/disc/movie/title info, a log, and input forms when decisions are needed. `Ctrl+C` exits cleanly.
+
+![mkvbot TUI mid-rip](screenshot.png)
 
 ## Beta Key
 

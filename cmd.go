@@ -12,6 +12,7 @@ import (
 var Version string
 
 const (
+	demoFlagName          = "demo"
 	configFlagName        = "config"
 	createConfigFlagName  = "create-config"
 	debugFlagName         = "debug"
@@ -50,6 +51,10 @@ func newCLICommand() *cli.Command {
 		Usage:     "Automation for makemkv",
 		Copyright: "(c) 2025–2026 Curt Hash",
 		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:  demoFlagName,
+				Usage: "show the TUI with fake data and exit on Ctrl+C",
+			},
 			&cli.StringFlag{
 				Name:        configFlagName,
 				Value:       defaultConfigPath,
