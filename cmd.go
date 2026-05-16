@@ -124,6 +124,9 @@ func newCLICommand() *cli.Command {
 				Sources: tomlSource("log_file_path"),
 			},
 		},
+		Commands: []*cli.Command{
+			newUpdateKeyCommand(),
+		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			return run(ctx, cmd)
 		},
